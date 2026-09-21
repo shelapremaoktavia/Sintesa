@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AppHeader from '../../components/ui/AppHeader';
+import TaskAttachmentBox from '../../components/tugas/TaskAttachmentBox';
 import { SuccessOverlay, BadgeOverlay, diffBadges } from '../../components/ui/Celebration';
 import { getSavedUser } from '../../lib/api';
 import { fetchMyGamification } from '../../lib/gamification';
@@ -89,6 +90,7 @@ function StudentTaskCard({ task, files, onUploaded }) {
         </span>
       </div>
       {task.description && <p className="text-sm text-slate-500 leading-6">{task.description}</p>}
+      <TaskAttachmentBox task={task} />
 
       {files.length > 0 && (
         <div className="mt-3 grid gap-2">
@@ -169,35 +171,51 @@ function TeacherTaskCard({ task, files, onGrade, onDelete }) {
           <h3 className="font-extrabold text-lg mt-1">{task.title}</h3>
           <div className="text-xs text-slate-500 mt-1">{task.description || `Siswa mendapat +${task.points || 100} XP saat mengumpulkan.`}</div>
         </div>
-        <span className="due-pill due-done">+{task.points || 100} XP · {files.length} file</span>
+        <span className="due-pill due-done">+{task.points || 100} XP · {files.length} pengumpulan</span>
       </div>
+      <TaskAttachmentBox task={task} />
 
       {files.length === 0 ? (
         <div className="empty" style={{ padding: 18 }}>Belum ada file masuk untuk tugas ini.</div>
       ) : (
-        <div className="grid gap-2 mt-3">
-          {files.map((f) => (
-            <div key={f.id} className="rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-sm">
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span><strong>👤 {f.student?.name || 'Siswa'}</strong> · 📄 {f.originalName} <span className="text-slate-400">· {formatSize(f.sizeKb)}</span></span>
-                <span className="flex gap-2">
-                  <a className="btn btn-soft btn-sm" href={fileAbsoluteUrl(f)} target="_blank" rel="noreferrer" download>⬇️ Unduh</a>
-                  <button className="btn btn-soft btn-sm" onClick={() => openGrade(f)}>★ {f.grade ?? 'Nilai'}</button>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={async () => {
-                      if (!confirm(`Hapus "${f.originalName}"?`)) return;
-                      setBusyId(f.id);
-                      try { await onDelete(f.id); } finally { setBusyId(''); }
-                    }}
-                    disabled={busyId === f.id}
-                  >
-                    🗑️
-                  </button>
+        <div className="grid gap-3 mt-3">
+          {files.map((f, i) => (
+            <article key={f.id} className="panel submission-card">
+              <div className="submission-head">
+                <span className="submission-ava" aria-hidden="true">
+                  {(f.student?.name || 'S').charAt(0).toUpperCase()}
                 </span>
+                <span className="submission-who">
+                  <strong>#{i + 1} · {f.student?.name || 'Siswa'}</strong>
+                  <small>{formatDate(f.createdAt)} · {formatSize(f.sizeKb)}</small>
+                </span>
+                {f.grade !== null && f.grade !== undefined ? (
+                  <span className={`grade-badge grade-static ${f.grade >= 75 ? 'grade-good' : 'grade-low'}`}>★ {f.grade}</span>
+                ) : (
+                  <span className="due-pill">Belum dinilai</span>
+                )}
               </div>
-              {f.feedback && <div className="library-feedback mt-2">💬 {f.feedback}</div>}
-            </div>
+              <div className="submission-file">
+                <span className="submission-fname" title={f.originalName}>📄 {f.originalName}</span>
+              </div>
+              {f.description && <p className="submission-note">“{f.description}”</p>}
+              {f.feedback && <div className="library-feedback">💬 {f.feedback}</div>}
+              <div className="submission-actions">
+                <a className="btn btn-soft btn-sm" href={fileAbsoluteUrl(f)} target="_blank" rel="noreferrer" download>⬇️ Unduh</a>
+                <button className="btn btn-primary btn-sm" onClick={() => openGrade(f)}>★ {f.grade ?? 'Beri Nilai'}</button>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={async () => {
+                    if (!confirm(`Hapus pengumpulan "${f.originalName}" milik ${f.student?.name || 'siswa'}?`)) return;
+                    setBusyId(f.id);
+                    try { await onDelete(f.id); } finally { setBusyId(''); }
+                  }}
+                  disabled={busyId === f.id}
+                >
+                  {busyId === f.id ? '…' : '🗑️ Hapus'}
+                </button>
+              </div>
+            </article>
           ))}
         </div>
       )}
@@ -310,7 +328,7 @@ export default function TugasPage() {
             {user?.role === 'GURU' && <span className="stat-pill">📥 {files.length} file masuk</span>}
           </div>
           <div className="quick-links mt-3">
-            <Link href="/library" className="btn btn-light btn-sm">🗂️ Arsip Library (+50/file)</Link>
+            <Link href="/library" className="btn btn-light btn-sm">🗂️ Arsip Library</Link>
             <Link href={user?.role === 'GURU' ? '/guru' : '/siswa'} className="btn btn-outline-light btn-sm">← Dashboard</Link>
           </div>
         </section>

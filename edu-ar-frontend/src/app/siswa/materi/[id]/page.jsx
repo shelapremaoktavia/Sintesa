@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import ViewerAR from '../../../../components/ARViewer/ViewerAR';
 import AppHeader from '../../../../components/ui/AppHeader';
+import TaskAttachmentBox from '../../../../components/tugas/TaskAttachmentBox';
 import { SuccessOverlay, BadgeOverlay, diffBadges } from '../../../../components/ui/Celebration';
 import { apiFetch, getSavedUser } from '../../../../lib/api';
 import { arForMaterial } from '../../../../lib/arCatalog';
@@ -153,6 +154,7 @@ export default function StudentMaterialPage() {
                     <div key={t.id} className="assign-card">
                       <div className="assign-head"><strong>{t.title}</strong><span className="due-pill due-done">+{t.points || 100} XP</span></div>
                       <p className="text-xs text-slate-500">{t.description || 'Kumpulkan di halaman Tugas untuk dapat XP poin guru.'}</p>
+                      <TaskAttachmentBox task={t} />
                       <Link href="/tugas" className="btn btn-primary btn-sm w-full">📤 Kumpulkan di Tugas</Link>
                     </div>
                   ))}

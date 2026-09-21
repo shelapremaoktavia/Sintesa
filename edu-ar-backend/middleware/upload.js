@@ -91,3 +91,34 @@ const avatarUpload = multer({
 
 module.exports.avatarUpload = avatarUpload;
 module.exports.AVATAR_DIR = AVATAR_DIR;
+
+// ============ LAMPIRAN TUGAS GURU (PDF, video, gambar, dsb — opsional) ============
+// Memakai whitelist yang sama dengan Library agar konsisten di seluruh aplikasi.
+const TASK_DIR = path.join(UPLOAD_DIR, 'tasks');
+
+if (!fs.existsSync(TASK_DIR)) {
+  fs.mkdirSync(TASK_DIR, { recursive: true });
+}
+
+const taskStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, TASK_DIR),
+  filename: (req, file, cb) => {
+    const safe = (file.originalname || 'file').replace(/[^a-zA-Z0-9.\-_ ]/g, '').slice(-80) || 'file';
+    cb(null, `tugas-${Date.now()}-${Math.round(Math.random() * 1e9)}-${safe}`);
+  },
+});
+
+function taskFilter(req, file, cb) {
+  const ext = path.extname(file.originalname || '').toLowerCase();
+  if (ALLOWED_MIMES.has(file.mimetype) || ALLOWED_EXT.has(ext)) return cb(null, true);
+  cb(new Error('Tipe file tidak didukung. Gunakan gambar, PDF, Word, PPT, Excel, TXT, ZIP, MP4, atau MP3.'));
+}
+
+const taskUpload = multer({
+  storage: taskStorage,
+  fileFilter: taskFilter,
+  limits: { fileSize: 15 * 1024 * 1024 }, // 15 MB
+});
+
+module.exports.taskUpload = taskUpload;
+module.exports.TASK_DIR = TASK_DIR;
