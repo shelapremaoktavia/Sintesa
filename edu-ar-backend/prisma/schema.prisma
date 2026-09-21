@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  GURU
+  SISWA
+  ADMIN
+}
+
+enum Jenjang {
+  SD
+  SMP
+  SMA
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(SISWA)
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  classesTaught Class[]           @relation("TeacherClasses")
+  enrollments   ClassEnrollment[]
+  progress      StudentProgress[]
+  assignmentsTaught Assignment[]  @relation("TeacherAssignments")
+  submissions   Submission[]
+
+  @@map("users")
+}
+
+model Class {
+  id          String            @id @default(cuid())
+  name        String
+  description String?
+  code        String            @unique
+  teacherId   String
+  teacher     User              @relation("TeacherClasses", fields: [teacherId], references: [id])
+
+  materials   Material[]
+  enrollments ClassEnrollment[]
+  assignments Assignment[]
+
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@map("classes")
+}
+
+model ClassEnrollment {
+  id        String   @id @default(cuid())
+  studentId String
+  classId   String
+
+  student   User     @relation(fields: [studentId], references: [id])
+  class     Class    @relation(fields: [classId], references: [id])
+
+  joinedAt  DateTime @default(now())
+
+  @@unique([studentId, classId])
+  @@map("class_enrollments")
+}
+
+model Subject {
+  id        String     @id @default(cuid())
+  name      String
+  jenjang   Jenjang
+  materials Material[]
+
+  @@map("subjects")
+}
+
+model Material {
+  id          String            @id @default(cuid())
+  title       String
+  description String?           @db.Text
+  jenjang     Jenjang
+
+  subjectId   String
+  subject     Subject           @relation(fields: [subjectId], references: [id])
+
+  classId     String?
+  class       Class?            @relation(fields: [classId], references: [id])
+
+  assets      Asset3D[]
+  progress    StudentProgress[]
+  assignments Assignment[]
+
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@map("materials")
+}
+
+model Asset3D {
+  id           String   @id @default(cuid())
+  name         String
+  materialId   String
+  material     Material @relation(fields: [materialId], references: [id])
+
+  glbUrl       String
+  usdzUrl      String?
+  posterUrl    String?
+
+  fileSizeKb   Int?
+  hasAnimation Boolean  @default(false)
+  isInteractive Boolean @default(false)
+
+  createdAt    DateTime @default(now())
+
+  @@map("assets_3d")
+}
+
+model StudentProgress {
+  id         String    @id @default(cuid())
+  studentId  String
+  student    User      @relation(fields: [studentId], references: [id])
+
+  materialId String
+  material   Material  @relation(fields: [materialId], references: [id])
+
+  completed  Boolean   @default(false)
+  viewedAt   DateTime?
+
+  @@unique([studentId, materialId])
+  @@map("student_progress")
+}
+
+model Assignment {
+  id          String    @id @default(cuid())
+  title       String
+  description String?   @db.Text
+  points      Int       @default(100)
+  dueDate     DateTime?
+
+  classId     String
+  class       Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  materialId  String?
+  material    Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
+
+  teacherId   String
+  teacher     User      @relation("TeacherAssignments", fields: [teacherId], references: [id])
+
+  submissions Submission[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("assignments")
+}
+
+model Submission {
+  id           String   @id @default(cuid())
+
+  assignmentId String?
+  assignment   Assignment? @relation(fields: [assignmentId], references: [id], onDelete: SetNull)
+
+  studentId    String
+  student      User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  classId      String?
+  materialId   String?
+
+  fileName     String
+  originalName String
+  mimeType     String
+  sizeKb       Int      @default(0)
+  fileUrl      String
+  description  String?  @db.Text
+
+  grade        Int?
+  feedback     String?  @db.Text
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("submissions")
+}
