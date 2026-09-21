@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AppHeader from '../../components/ui/AppHeader';
+import AttachmentPicker from '../../components/tugas/AttachmentPicker';
 import { apiFetch, getSavedUser } from '../../lib/api';
 import { createAssignment, fetchLibraryStats, fetchMyAssignments } from '../../lib/library';
 import { fetchLeaderboard } from '../../lib/gamification';
@@ -24,6 +25,9 @@ export default function GuruDashboard() {
 
   // Form tugas cepat
   const [task, setTask] = useState({ classId: '', title: '', description: '', points: 100, dueDate: '' });
+  const [taskFile, setTaskFile] = useState(null);
+  const [taskFileError, setTaskFileError] = useState('');
+  const taskFileRef = useRef(null);
   const [creatingTask, setCreatingTask] = useState(false);
 
   const fetchAll = async () => {
@@ -78,9 +82,10 @@ export default function GuruDashboard() {
         description: task.description.trim() || undefined,
         points: Number(task.points) || 100,
         dueDate: task.dueDate || undefined,
-      });
-      setOk(`Tugas “${created.title}” dibuat (+${created.points || 100} XP untuk siswa).`);
+      }, taskFile || undefined);
+      setOk(`Tugas “${created.title}” dibuat (+${created.points || 100} XP untuk siswa).${taskFile ? ' 📎 Lampiran terunggah.' : ''}`);
       setTask((t) => ({ ...t, title: '', description: '', points: 100, dueDate: '' }));
+      setTaskFile(null); setTaskFileError('');
       await fetchAll();
     } catch (err) {
       setError(err.message || 'Gagal membuat tugas.');
@@ -204,6 +209,13 @@ export default function GuruDashboard() {
               <div className="form-group"><label className="form-label">Poin XP</label><input type="number" min="10" max="1000" className="input" value={task.points} onChange={(e) => setTask({ ...task, points: e.target.value })} /></div>
               <div className="form-group"><label className="form-label">Tenggat</label><input type="date" className="input" value={task.dueDate} onChange={(e) => setTask({ ...task, dueDate: e.target.value })} /></div>
             </div>
+            <AttachmentPicker
+              file={taskFile}
+              inputRef={taskFileRef}
+              error={taskFileError}
+              onPick={(f, err) => { setTaskFile(f); setTaskFileError(err); }}
+              onClear={() => { setTaskFile(null); setTaskFileError(''); }}
+            />
             <button className="btn btn-primary w-full" disabled={creatingTask}>{creatingTask ? 'Membuat…' : '＋ Buat Tugas'}</button>
           </form>
         </section>

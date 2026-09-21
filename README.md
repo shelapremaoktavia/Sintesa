@@ -8,6 +8,8 @@ Project final ini mempertahankan struktur dua folder: `edu-ar-frontend` dan `edu
 - Komponen AR tangguh (`ViewerAR`): loading, fallback model, tombol AR khusus perangkat mendukung
 - Sistem gamifikasi stabil: materi +100, dilihat +10, TUGAS = poin guru (sekali per tugas), arsip 0 XP; 6 level, 6 badge, leaderboard live
 - Halaman TUGAS (/tugas) terpisah: siswa kumpulkan per tugas guru, guru nilai + feedback per file
+- Pengumpulan guru tampil terpisah: tiap file siswa jadi kartu sendiri (nama, tanggal, nilai, feedback)
+- Tugas bisa dilampiri file penjelas guru (PDF, video, gambar, Word, PPT, maks 15 MB)
 - Halaman LIBRARY (/library) khusus arsip mandiri tanpa XP: gambar, PDF, Word, PPT, Excel, TXT, CSV, ZIP, MP4/MP3
 - Halaman MISI AR (/ar) sendiri: 6 misi + materi & soal latihan per misi + Kelasku (gabung kelas & materi guru)
 - Drawer hamburger kiri: profil + foto + XP/level siswa di atas, menu Dashboard/Tugas/Library/Misi AR

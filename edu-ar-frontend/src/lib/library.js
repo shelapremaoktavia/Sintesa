@@ -177,11 +177,51 @@ export async function fetchClassAssignments(classId) {
   return Array.isArray(data) ? data : [];
 }
 
-export async function createAssignment(payload) {
+export async function createAssignment(payload, attachmentFile) {
+  // Guru boleh melampirkan 1 file penjelas (PDF, video, gambar, dsb).
+  // Jika ada file → kirim multipart; jika tidak → JSON seperti biasa.
+  if (attachmentFile) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const form = new FormData();
+    Object.entries(payload || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') form.append(key, String(value));
+    });
+    form.append('attachment', attachmentFile);
+    const response = await fetch(`${API_URL}/assignments`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || 'Gagal membuat tugas.');
+    return data;
+  }
   const { response, data } = await apiFetch('/assignments', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
   if (!response.ok) throw new Error(data.message || 'Gagal membuat tugas.');
   return data;
+}
+
+/** URL absolut lampiran guru pada tugas (atau null bila tidak ada). */
+export function taskAttachmentUrl(task = {}) {
+  const u = task.attachFileUrl;
+  if (!u) return null;
+  if (u.startsWith('http')) return u;
+  return `${BACKEND_ORIGIN}${u}`;
+}
+
+/** Ikon emoji berdasarkan tipe lampiran tugas. */
+export function taskAttachmentIcon(task = {}) {
+  const name = (task.attachOriginalName || '').toLowerCase();
+  const mime = task.attachMimeType || '';
+  if (mime.startsWith('image/')) return '🖼️';
+  if (mime === 'application/pdf' || name.endsWith('.pdf')) return '📕';
+  if (mime.startsWith('video/') || name.endsWith('.mp4')) return '🎬';
+  if (/pptx?$/.test(name)) return '📊';
+  if (/xlsx?|csv$/.test(name)) return '📗';
+  if (/docx?$/.test(name)) return '📘';
+  if (/zip$/.test(name)) return '📦';
+  return '📎';
 }

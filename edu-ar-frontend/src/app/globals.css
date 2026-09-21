@@ -492,6 +492,47 @@ button { cursor: pointer; }
 .badge-locked { opacity:.45; filter:grayscale(1); }
 .assign-card { border:1px solid var(--line); border-radius:16px; padding:14px; background:#fbfdff; }
 .assign-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:8px; }
+/* Kartu tiap pengumpulan siswa (terpisah satu per satu di halaman guru) */
+.submission-card { padding:14px; display:grid; gap:10px; }
+.submission-head { display:flex; align-items:center; gap:10px; }
+.submission-ava {
+  width:38px; height:38px; border-radius:50%; display:grid; place-items:center; flex-shrink:0;
+  background:linear-gradient(135deg,#38bdf8,#6366f1); color:#fff; font-weight:800;
+}
+.submission-who { flex:1; min-width:0; display:grid; gap:1px; }
+.submission-who strong { font-size:14px; }
+.submission-who small { font-size:11px; color:#64748b; }
+.grade-static { position:static; }
+.submission-file {
+  background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:9px 11px;
+  font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.submission-note { margin:0; font-size:12px; color:#64748b; font-style:italic; line-height:1.6; }
+.submission-actions { display:flex; gap:7px; flex-wrap:wrap; }
+/* Kotak lampiran guru pada tugas */
+.attach-box {
+  display:flex; align-items:center; gap:10px; margin-top:10px; padding:10px 12px;
+  background:#fffbeb; border:1.5px dashed #f59e0b; border-radius:12px;
+}
+.attach-box-icon { font-size:24px; flex-shrink:0; }
+.attach-box-text { flex:1; min-width:0; display:grid; gap:1px; }
+.attach-box-text strong { font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.attach-box-text small { font-size:11px; color:#92400e; }
+/* Picker lampiran di form buat tugas */
+.attach-picker {
+  width:100%; display:flex; align-items:center; gap:10px; text-align:left;
+  border:2px dashed #b9d4ef; background:#f6fbff; border-radius:12px; padding:12px 14px; transition:.2s;
+}
+.attach-picker:hover { border-color:#2379d9; background:#eef6ff; }
+.attach-picker-icon { font-size:24px; }
+.attach-picker strong { display:block; font-size:13px; }
+.attach-picker small { display:block; font-size:11px; color:var(--ink-soft); }
+.attach-chosen {
+  display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;
+  border:1.5px solid #6ee7b7; background:#f0fdf4; border-radius:12px; padding:10px 12px;
+}
+.attach-chosen-name { font-size:13px; font-weight:700; }
+.attach-chosen-name small { font-weight:400; color:#64748b; }
 .due-pill { font-size:11px; font-weight:800; padding:5px 9px; border-radius:999px; background:#fef3c7; color:#92400e; white-space:nowrap; }
 .due-over { background:#fee2e2; color:#b91c1c; }
 .due-done { background:#dcfce7; color:#15803d; }

@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import AppHeader from '../../../../components/ui/AppHeader';
+import AttachmentPicker from '../../../../components/tugas/AttachmentPicker';
 import { apiFetch, getSavedUser } from '../../../../lib/api';
 import { createAssignment, fetchClassAssignments } from '../../../../lib/library';
 
@@ -18,6 +19,9 @@ export default function GuruClassDetail() {
   const [error, setError] = useState('');
   const [ok, setOk] = useState('');
   const [taskForm, setTaskForm] = useState({ title: '', description: '', points: 100, dueDate: '' });
+  const [taskFile, setTaskFile] = useState(null);
+  const [taskFileError, setTaskFileError] = useState('');
+  const taskFileRef = useRef(null);
   const [creatingTask, setCreatingTask] = useState(false);
 
   const load = async () => {
@@ -66,9 +70,10 @@ export default function GuruClassDetail() {
         description: taskForm.description.trim() || undefined,
         points: Number(taskForm.points) || 100,
         dueDate: taskForm.dueDate || undefined,
-      });
-      setOk('Tugas dibuat! Siswa bisa mengumpulkannya ke Library. 📌');
+      }, taskFile || undefined);
+      setOk('Tugas dibuat! Siswa bisa mengumpulkannya di /tugas. 📌');
       setTaskForm({ title: '', description: '', points: 100, dueDate: '' });
+      setTaskFile(null); setTaskFileError('');
       await load();
     } catch (err) {
       setError(err.message || 'Gagal membuat tugas.');
@@ -116,11 +121,18 @@ export default function GuruClassDetail() {
               <div className="form-group"><label className="form-label">Poin XP</label><input type="number" min="10" max="1000" className="input" value={taskForm.points} onChange={(e) => setTaskForm({ ...taskForm, points: e.target.value })} /></div>
               <div className="form-group"><label className="form-label">Tenggat</label><input type="date" className="input" value={taskForm.dueDate} onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })} /></div>
             </div>
+            <AttachmentPicker
+              file={taskFile}
+              inputRef={taskFileRef}
+              error={taskFileError}
+              onPick={(f, err) => { setTaskFile(f); setTaskFileError(err); }}
+              onClear={() => { setTaskFile(null); setTaskFileError(''); }}
+            />
             <button className="btn btn-primary w-full" disabled={creatingTask}>{creatingTask ? 'Membuat…' : '+ Buat Tugas'}</button>
           </form>
           <div className="panel p-5">
-            <div className="flex items-center justify-between mb-4"><div><h2 className="font-extrabold text-lg">📌 Tugas di Kelas ({assignments.length})</h2><p className="text-sm text-slate-500 mt-1">Klik untuk menilai file yang masuk via Library.</p></div><Link href="/library" className="btn btn-soft btn-sm">Buka Library →</Link></div>
-            {assignments.length ? <div className="grid sm:grid-cols-2 gap-3">{assignments.map((t) => <div key={t.id} className="assign-card"><div className="assign-head"><strong>{t.title}</strong><span className="due-pill due-done">+{t.points || 100} XP</span></div><div className="text-xs text-slate-500 mb-2">{t._count?.submissions ?? t.submissions?.length ?? 0} file masuk</div><Link href="/library" className="btn btn-soft btn-sm w-full">Nilai submission →</Link></div>)}</div> : <div className="empty p-5">Belum ada tugas. Buat lewat formulir di samping.</div>}
+            <div className="flex items-center justify-between mb-4"><div><h2 className="font-extrabold text-lg">📌 Tugas di Kelas ({assignments.length})</h2><p className="text-sm text-slate-500 mt-1">Nilai file yang masuk di halaman Tugas.</p></div><Link href="/tugas" className="btn btn-soft btn-sm">Buka Tugas →</Link></div>
+            {assignments.length ? <div className="grid sm:grid-cols-2 gap-3">{assignments.map((t) => <div key={t.id} className="assign-card"><div className="assign-head"><strong>{t.title}</strong><span className="due-pill due-done">+{t.points || 100} XP</span></div><div className="text-xs text-slate-500 mb-2">{t._count?.submissions ?? t.submissions?.length ?? 0} file masuk</div><Link href="/tugas" className="btn btn-soft btn-sm w-full">Nilai submission →</Link></div>)}</div> : <div className="empty p-5">Belum ada tugas. Buat lewat formulir di samping.</div>}
           </div>
         </section>
 

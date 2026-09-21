@@ -153,6 +153,13 @@ model Assignment {
 
   submissions Submission[]
 
+  // Lampiran guru untuk memperjelas tugas (PDF, video, gambar, dsb — opsional)
+  attachFileName     String?
+  attachOriginalName String?
+  attachMimeType     String?
+  attachSizeKb       Int?
+  attachFileUrl      String?
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
