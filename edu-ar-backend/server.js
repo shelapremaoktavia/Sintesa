@@ -13,6 +13,7 @@ const classRoutes = require('./routes/classRoutes');
 const assignmentRoutes = require('./routes/assignmentRoutes');
 const libraryRoutes = require('./routes/libraryRoutes');
 const gamificationRoutes = require('./routes/gamificationRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -57,6 +58,10 @@ app.use('/api/library', libraryRoutes);
 // Endpoint gamifikasi: XP, level, badge, leaderboard
 // GET /api/gamification/me, GET /api/gamification/leaderboard
 app.use('/api/gamification', gamificationRoutes);
+
+// Endpoint admin: kelola akun guru (khusus role ADMIN)
+// GET /api/admin/users, POST /api/admin/teachers
+app.use('/api/admin', adminRoutes);
 
 // Route untuk mengecek koneksi ke database Neon/PostgreSQL lewat Prisma.
 app.get('/test-db', async (req, res) => {

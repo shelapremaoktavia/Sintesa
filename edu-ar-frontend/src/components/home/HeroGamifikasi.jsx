@@ -18,8 +18,8 @@ export default function HeroGamifikasi({ user }) {
             Materi Hidup dalam <span className="grad-text-alt">AR 3D</span>
           </h1>
           <p className="landing-lead">
-            Sintesa mengubah IPA, Biologi, Fisika, dan Kimia menjadi misi seru: kumpulkan XP,
-            naik level, rebut badge, dan hadirkan model 3D langsung ke meja belajarmu lewat kamera HP.
+            Sintesa mengubah mapel RPL Kelas 10 — Sistem Komputer, Jaringan, Informatika — menjadi misi seru:
+            kumpulkan XP, naik level hingga MAX, rebut badge, dan hadirkan model 3D langsung ke meja belajarmu lewat kamera HP.
           </p>
 
           <div className="hero-cta">
@@ -37,32 +37,32 @@ export default function HeroGamifikasi({ user }) {
           </div>
 
           <div className="hero-proof">
-            <div className="proof-item"><strong>6</strong><span>Model AR per pelajaran</span></div>
-            <div className="proof-item"><strong>3</strong><span>Jenjang SD–SMA</span></div>
+            <div className="proof-item"><strong>6</strong><span>Model AR RPL</span></div>
+            <div className="proof-item"><strong>10</strong><span>Kelas 10 SMK RPL</span></div>
             <div className="proof-item"><strong>100</strong><span>XP tiap misi selesai</span></div>
             <div className="proof-item"><strong>∞</strong><span>File tugas di Library</span></div>
           </div>
 
           <div className="hero-levels">
             <span className="mini-chip">🌱 Lv.1 Penjelajah Baru</span>
-            <span className="mini-chip">🚀 Lv.3 Penjelajah Aktif</span>
-            <span className="mini-chip">🏆 Lv.6 Master AR</span>
+            <span className="mini-chip">🚀 Lv.2 Penjelajah Aktif</span>
+            <span className="mini-chip">🏆 Lv.3 Master Sintesa · MAX</span>
           </div>
         </div>
 
         <div className="hero-ar-panel">
           <div className="hero-ar-head">
-            <span className="live-dot" /> LIVE PREVIEW · MODEL AR ASTRONOT
+            <span className="live-dot" /> LIVE PREVIEW · MODEL AR ROBOT
             <span className="xp-float">+100 XP</span>
           </div>
           <div className="hero-ar-view">
-            <ViewerAR glbSrc={AR_CATALOG[0].glb} usdzSrc={AR_CATALOG[0].usdz} alt="Preview AR Tata Surya" compact />
+            <ViewerAR glbSrc={AR_CATALOG[0].glb} usdzSrc={AR_CATALOG[0].usdz} alt="Preview AR Sistem Komputer" compact />
           </div>
           <div className="hero-ar-foot">
             <div className="hero-mission">
-              <span className="mission-emoji">🪐</span>
+              <span className="mission-emoji">🤖</span>
               <div>
-                <strong>Misi: Sistem Tata Surya</strong>
+                <strong>Misi: Sistem Komputer</strong>
                 <p>Putar model · Zoom · Ketuk “Lihat dalam AR”</p>
               </div>
             </div>

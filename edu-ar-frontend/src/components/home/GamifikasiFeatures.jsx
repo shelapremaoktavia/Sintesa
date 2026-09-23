@@ -3,10 +3,10 @@
 import { SectionHeading } from '../ui/badges';
 
 const FEATURES = [
-  { icon: '⚡', title: 'XP & Level', desc: 'Materi selesai +100 XP, dilihat +10 XP, tugas guru +poin guru. Arsip Library murni penyimpanan (0 XP). Naik hingga Master AR.' },
+  { icon: '⚡', title: 'XP & Level 1–3', desc: 'Materi +100 XP, tugas guru +poin (bisa sampai 10.000!). Level 3 Master Sintesa adalah MAX — kejar XP setinggi-tingginya tanpa batas.' },
   { icon: '🏅', title: 'Badge & Pencapaian', desc: 'Kumpulkan 6 badge: Langkah Pertama, Penjelajah 3D, Master Materi, Pengumpul Tugas, Pejuang Tugas, Bintang AR.' },
   { icon: '🏆', title: 'Leaderboard Kelas', desc: 'Papan peringkat real-time memicu kompetisi sehat antar siswa di setiap kelas.' },
-  { icon: '🧊', title: 'AR per Pelajaran', desc: '6 misi 3D/AR tematik — tata surya, sel, katrol, molekul, anatomi — tiap misi ada materi & soal, di halaman /ar.' },
+  { icon: '🧊', title: 'AR Khusus RPL', desc: '6 misi 3D/AR Kelas 10 RPL — sistem komputer, jaringan, hardware, mikrokontroler, algoritma & keamanan data.' },
   { icon: '🗂️', title: 'Library Arsip', desc: 'Simpan file apa pun (gambar, PDF, Word, PPT, Excel, video) sebagai arsip pribadi tanpa XP.' },
   { icon: '🎯', title: 'Misi Terstruktur', desc: 'Alur jelas: gabung kelas → mainkan misi AR → tandai selesai → kumpulkan tugas → naik level.' },
 ];

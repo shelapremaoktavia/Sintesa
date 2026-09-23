@@ -14,12 +14,9 @@ const XP_LIBRARY_FILE = 0;
 const DEFAULT_TASK_POINTS = 100;
 
 function levelForXp(xp) {
-  if (xp >= 1200) return { level: 6, title: 'Master AR', nextAt: null };
-  if (xp >= 800) return { level: 5, title: 'Penjelajah Elite', nextAt: 1200 };
-  if (xp >= 500) return { level: 4, title: 'Penjelajah Mahir', nextAt: 800 };
-  if (xp >= 300) return { level: 3, title: 'Penjelajah Aktif', nextAt: 500 };
-  if (xp >= 150) return { level: 2, title: 'Penjelajah Muda', nextAt: 300 };
-  return { level: 1, title: 'Penjelajah Baru', nextAt: 150 };
+  if (xp >= 1500) return { level: 3, title: 'Master Sintesa', nextAt: null };
+  if (xp >= 500) return { level: 2, title: 'Penjelajah Aktif', nextAt: 1500 };
+  return { level: 1, title: 'Penjelajah Baru', nextAt: 500 };
 }
 
 function badgesFor({ completed, tasksDone = 0, submissions = 0, xp }) {

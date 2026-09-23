@@ -47,7 +47,7 @@ function DrawerSection({ icon, title, items, renderItem, emptyText, footerHref, 
   );
 }
 
-/** Header simpel: tombol garis-3 di kiri + drawer (profil+XP, Dashboard, Tugas, Library, AR, Kelas, Tugas). */
+/** Header simpel: tombol garis-3 di kiri + drawer (profil, Dashboard, Tugas, Library, AR, Kelas, Tugas). */
 export default function AppHeader({ active = '' }) {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -81,8 +81,13 @@ export default function AppHeader({ active = '' }) {
   }, [open ]);
 
   // Muat daftar kelas & tugas saat drawer pertama kali dibuka (agar ringan).
+  // ADMIN tidak butuh data ini.
   useEffect(() => {
     if (!open || !user || metaLoaded) return;
+    if (user.role !== 'GURU' && user.role !== 'SISWA') {
+      setMetaLoaded(true);
+      return;
+    }
     let cancelled = false;
     (async () => {
       try {
@@ -132,7 +137,8 @@ export default function AppHeader({ active = '' }) {
     }
   };
 
-  const dashboardHref = user?.role === 'GURU' ? '/guru' : '/siswa';
+  const dashboardHref = user?.role === 'ADMIN' ? '/admin' : user?.role === 'GURU' ? '/guru' : '/siswa';
+  const roleLabel = user?.role === 'ADMIN' ? 'Admin' : user?.role === 'GURU' ? 'Guru' : 'Murid';
   const linkCls = (key) => `drawer-link ${active === key ? 'drawer-link-active' : ''}`;
   const close = () => setOpen(false);
   const lvl = levelForXp(gami?.xp ?? 0);
@@ -141,9 +147,9 @@ export default function AppHeader({ active = '' }) {
 
   const MENU = [
     { key: 'home', href: '/', icon: '🏠', label: 'Beranda', show: true },
-    { key: 'dashboard', href: user ? dashboardHref : '/login', icon: '📊', label: 'Dashboard', show: true },
-    { key: 'tugas', href: '/tugas', icon: '📌', label: 'Tugas', show: !!user },
-    { key: 'library', href: '/library', icon: '🗂️', label: 'Library', show: !!user },
+    { key: 'dashboard', href: user ? dashboardHref : '/login', icon: '📊', label: user?.role === 'ADMIN' ? 'Panel Admin' : 'Dashboard', show: true },
+    { key: 'tugas', href: '/tugas', icon: '📌', label: 'Tugas', show: user?.role === 'GURU' || user?.role === 'SISWA' },
+    { key: 'library', href: '/library', icon: '🗂️', label: 'Library', show: user?.role === 'GURU' || user?.role === 'SISWA' },
     { key: 'ar', href: '/ar', icon: '🧊', label: 'Misi AR', show: true },
   ].filter((m) => m.show);
 
@@ -179,7 +185,7 @@ export default function AppHeader({ active = '' }) {
                 )}
                 <div className="user-mini header-user-mini">
                   <div className="text-sm font-bold leading-tight">{user?.name}</div>
-                  <div className="text-xs text-slate-400 leading-tight">{user?.role === 'GURU' ? 'Guru' : 'Siswa'}</div>
+                  <div className="text-xs text-slate-400 leading-tight">{roleLabel}</div>
                 </div>
                 <button className="btn btn-soft" onClick={() => logout(router)}>Keluar</button>
               </>
@@ -239,10 +245,20 @@ export default function AppHeader({ active = '' }) {
               </span>
               <Link href={dashboardHref} className="drawer-profile-text no-underline" onClick={close} title="Lihat dashboard">
                 <strong>{user?.name}</strong>
-                <small>{user?.role === 'GURU' ? 'Guru' : 'Siswa'}</small>
+                <small>{roleLabel} · Kelas 10 RPL</small>
                 {user?.role === 'SISWA' && (
                   <span className="drawer-xp">
                     <span aria-hidden="true">{lvl.icon}</span> Lv.{lvl.level} · {lvl.title} · {gami?.xp ?? 0} XP
+                  </span>
+                )}
+                {user?.role === 'GURU' && (
+                  <span className="drawer-xp drawer-xp-blue">
+                    <span aria-hidden="true">🏫</span> {metaLoaded ? classes.length : '…'} kelas diajar
+                  </span>
+                )}
+                {user?.role === 'ADMIN' && (
+                  <span className="drawer-xp drawer-xp-dark">
+                    <span aria-hidden="true">🛡️</span> Pengelola akun guru
                   </span>
                 )}
               </Link>
@@ -260,7 +276,7 @@ export default function AppHeader({ active = '' }) {
             ))}
           </nav>
 
-          {user && (
+          {(user?.role === 'GURU' || user?.role === 'SISWA') && (
             <>
               <DrawerSection
                 icon="🏫"
@@ -323,7 +339,7 @@ export default function AppHeader({ active = '' }) {
                 )}
                 <div>
                   <div className="text-sm font-bold">{user?.name}</div>
-                  <div className="text-xs text-slate-400">{user?.role === 'GURU' ? 'Guru' : 'Siswa'}</div>
+                  <div className="text-xs text-slate-400">{roleLabel}</div>
                 </div>
               </div>
               <button className="btn btn-soft w-full" onClick={() => { close(); logout(router); }}>Keluar</button>

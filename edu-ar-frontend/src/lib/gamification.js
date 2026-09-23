@@ -16,13 +16,12 @@ export const XP_RULES = {
 };
 
 export const LEVELS = [
-  { level: 1, title: 'Penjelajah Baru', minXp: 0, nextAt: 150, icon: '🌱' },
-  { level: 2, title: 'Penjelajah Muda', minXp: 150, nextAt: 300, icon: '🧭' },
-  { level: 3, title: 'Penjelajah Aktif', minXp: 300, nextAt: 500, icon: '🚀' },
-  { level: 4, title: 'Penjelajah Mahir', minXp: 500, nextAt: 800, icon: '🧊' },
-  { level: 5, title: 'Penjelajah Elite', minXp: 800, nextAt: 1200, icon: '⭐' },
-  { level: 6, title: 'Master AR', minXp: 1200, nextAt: null, icon: '🏆' },
+  { level: 1, title: 'Penjelajah Baru', minXp: 0, nextAt: 500, icon: '🌱' },
+  { level: 2, title: 'Penjelajah Aktif', minXp: 500, nextAt: 1500, icon: '🚀' },
+  { level: 3, title: 'Master Sintesa', minXp: 1500, nextAt: null, icon: '🏆' },
 ];
+
+export const MAX_LEVEL = 3;
 
 export function levelForXp(xp = 0) {
   const value = Number(xp) || 0;

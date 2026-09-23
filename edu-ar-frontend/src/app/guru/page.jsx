@@ -206,7 +206,7 @@ export default function GuruDashboard() {
             </div>
             <div className="form-group"><label className="form-label">Judul Tugas</label><input className="input" value={task.title} onChange={(e) => setTask({ ...task, title: e.target.value })} placeholder="Contoh: Laporan Praktikum Sel" required /></div>
             <div className="form-row-2">
-              <div className="form-group"><label className="form-label">Poin XP</label><input type="number" min="10" max="1000" className="input" value={task.points} onChange={(e) => setTask({ ...task, points: e.target.value })} /></div>
+              <div className="form-group"><label className="form-label">Poin XP (s.d. 10.000)</label><input type="number" min="10" max="10000" className="input" value={task.points} onChange={(e) => setTask({ ...task, points: e.target.value })} /></div>
               <div className="form-group"><label className="form-label">Tenggat</label><input type="date" className="input" value={task.dueDate} onChange={(e) => setTask({ ...task, dueDate: e.target.value })} /></div>
             </div>
             <AttachmentPicker

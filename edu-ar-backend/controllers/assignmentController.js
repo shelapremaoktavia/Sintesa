@@ -51,7 +51,7 @@ exports.createAssignment = async (req, res) => {
         materialId: materialId || null,
         teacherId: req.user.userId,
         dueDate: dueDate ? new Date(dueDate) : null,
-        points: Number.isFinite(Number(points)) ? Math.max(10, Math.min(1000, Number(points))) : 100,
+        points: Number.isFinite(Number(points)) ? Math.max(10, Math.min(10000, Number(points))) : 100,
         attachFileName: req.file?.filename || null,
         attachOriginalName: req.file?.originalname || null,
         attachMimeType: req.file?.mimetype || null,

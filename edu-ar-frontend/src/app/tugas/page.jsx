@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AppHeader from '../../components/ui/AppHeader';
 import TaskAttachmentBox from '../../components/tugas/TaskAttachmentBox';
+import FilePreview from '../../components/tugas/FilePreview';
 import { SuccessOverlay, BadgeOverlay, diffBadges } from '../../components/ui/Celebration';
 import { getSavedUser } from '../../lib/api';
 import { fetchMyGamification } from '../../lib/gamification';
@@ -36,6 +37,7 @@ function StudentTaskCard({ task, files, onUploaded }) {
   const [ok, setOk] = useState('');
   const [success, setSuccess] = useState(null);
   const [newBadges, setNewBadges] = useState([]);
+  const [preview, setPreview] = useState(null);
 
   const submitted = files.length > 0;
   const points = Number(task.points) || 100;
@@ -98,6 +100,7 @@ function StudentTaskCard({ task, files, onUploaded }) {
             <div key={f.id} className="rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-sm flex items-center justify-between gap-2 flex-wrap">
               <span className="font-bold truncate">📄 {f.originalName} <span className="font-normal text-slate-400">· {formatSize(f.sizeKb)} · {formatDate(f.createdAt)}</span></span>
               <span className="flex gap-2">
+                <button className="btn btn-soft btn-sm" onClick={() => setPreview(f)}>👁️ Preview</button>
                 <a className="btn btn-soft btn-sm" href={fileAbsoluteUrl(f)} target="_blank" rel="noreferrer" download>⬇️</a>
                 {f.grade !== null && f.grade !== undefined && <span className="due-pill due-done">★ {f.grade}</span>}
               </span>
@@ -135,12 +138,14 @@ function StudentTaskCard({ task, files, onUploaded }) {
     {!success && newBadges.length > 0 && (
       <BadgeOverlay badges={newBadges} onClose={() => setNewBadges([])} />
     )}
+    <FilePreview file={preview} onClose={() => setPreview(null)} />
     </>
   );
 }
 
 /** Kartu satu tugas untuk GURU: daftar file masuk + nilai per file. */
 function TeacherTaskCard({ task, files, onGrade, onDelete }) {
+  const [preview, setPreview] = useState(null);
   const [grading, setGrading] = useState(null);
   const [gradeVal, setGradeVal] = useState('');
   const [feedbackVal, setFeedbackVal] = useState('');
@@ -201,6 +206,7 @@ function TeacherTaskCard({ task, files, onGrade, onDelete }) {
               {f.description && <p className="submission-note">“{f.description}”</p>}
               {f.feedback && <div className="library-feedback">💬 {f.feedback}</div>}
               <div className="submission-actions">
+                <button className="btn btn-soft btn-sm" onClick={() => setPreview(f)}>👁️ Preview</button>
                 <a className="btn btn-soft btn-sm" href={fileAbsoluteUrl(f)} target="_blank" rel="noreferrer" download>⬇️ Unduh</a>
                 <button className="btn btn-primary btn-sm" onClick={() => openGrade(f)}>★ {f.grade ?? 'Beri Nilai'}</button>
                 <button
@@ -219,6 +225,8 @@ function TeacherTaskCard({ task, files, onGrade, onDelete }) {
           ))}
         </div>
       )}
+
+      <FilePreview file={preview} onClose={() => setPreview(null)} />
 
       {grading && (
         <div className="modal-backdrop" onClick={() => setGrading(null)}>

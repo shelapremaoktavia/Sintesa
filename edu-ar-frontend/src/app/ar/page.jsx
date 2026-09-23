@@ -7,7 +7,7 @@ import AppHeader from '../../components/ui/AppHeader';
 import ViewerAR from '../../components/ARViewer/ViewerAR';
 import { SectionHeading } from '../../components/ui/badges';
 import { getSavedUser, apiFetch } from '../../lib/api';
-import { AR_CATALOG } from '../../lib/arCatalog';
+import { AR_CATALOG, KELAS_FOKUS, arSubjects } from '../../lib/arCatalog';
 
 /** Kartu kuis per misi: pilih jawaban → periksa → skor + pembahasan. */
 function MissionQuiz({ mission }) {
@@ -187,8 +187,9 @@ export default function ARPage() {
   const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
   const [selected, setSelected] = useState(AR_CATALOG[0]);
-  const [jenjang, setJenjang] = useState('Semua');
+  const [mapel, setMapel] = useState('Semua');
   const [tab, setTab] = useState('misi');
+  const subjects = useMemo(() => ['Semua', ...arSubjects()], []);
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -199,14 +200,14 @@ export default function ARPage() {
   }, [router]);
 
   const filtered = useMemo(
-    () => (jenjang === 'Semua' ? AR_CATALOG : AR_CATALOG.filter((a) => a.jenjang === jenjang)),
-    [jenjang]
+    () => (mapel === 'Semua' ? AR_CATALOG : AR_CATALOG.filter((a) => a.subject === mapel)),
+    [mapel]
   );
 
   useEffect(() => {
     if (!filtered.find((f) => f.slug === selected.slug)) setSelected(filtered[0] || AR_CATALOG[0]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jenjang]);
+  }, [mapel]);
 
   if (!ready) return <main className="page-loading">Membuka misi AR…</main>;
 
@@ -216,9 +217,9 @@ export default function ARPage() {
 
       <div className="container hero">
         <section className="hero-card">
-          <p className="text-sm font-semibold text-white/75">🧊 MISI AR PER PELAJARAN</p>
+          <p className="text-sm font-semibold text-white/75">🧊 MISI AR · {KELAS_FOKUS.toUpperCase()} SMK</p>
           <h1 className="hero-title">Pilih misimu, pelajari materinya, jawab soalnya.</h1>
-          <p className="hero-text">6 misi tematik SD–SMA. Setiap misi punya model 3D/AR, materi ringkas, dan kuis latihan.</p>
+          <p className="hero-text">6 misi RPL {KELAS_FOKUS}: sistem komputer, jaringan, hardware, mikrokontroler, algoritma & keamanan data. Tiap misi punya model 3D/AR, materi, dan kuis.</p>
           <div className="hero-stat">
             <span className="stat-pill">🧊 6 misi AR</span>
             <span className="stat-pill">📖 {AR_CATALOG.reduce((a, m) => a + m.materi.length, 0)} materi</span>
@@ -233,9 +234,9 @@ export default function ARPage() {
 
       <main className="container section">
         <div className="ar-filter">
-          {['Semua', 'SD', 'SMP', 'SMA'].map((j) => (
-            <button key={j} onClick={() => setJenjang(j)} className={`pill-btn ${jenjang === j ? 'pill-active' : ''}`}>
-              {j === 'Semua' ? '🌍 Semua Jenjang' : `🎓 ${j}`}
+          {subjects.map((s) => (
+            <button key={s} onClick={() => setMapel(s)} className={`pill-btn ${mapel === s ? 'pill-active' : ''}`}>
+              {s === 'Semua' ? `🌍 Semua · ${KELAS_FOKUS}` : `📚 ${s}`}
             </button>
           ))}
         </div>
@@ -251,7 +252,7 @@ export default function ARPage() {
                 <span className="ar-item-emoji" style={{ background: item.gradient }}>{item.emoji}</span>
                 <span className="ar-item-text">
                   <strong>{item.title}</strong>
-                  <small>{item.jenjang} · {item.subject} · +{item.xp} XP</small>
+                  <small>{item.kelas} · {item.subject} · +{item.xp} XP</small>
                 </span>
                 <span className="ar-item-arrow">→</span>
               </button>
@@ -262,7 +263,7 @@ export default function ARPage() {
             <div className="ar-preview-head">
               <span className="ar-item-emoji" style={{ background: selected.gradient }}>{selected.emoji}</span>
               <div>
-                <div className="eyebrow">{selected.jenjang} · {selected.subject} · +{selected.xp} XP</div>
+                <div className="eyebrow">{selected.kelas} · {selected.subject} · +{selected.xp} XP</div>
                 <h3 className="ar-preview-title">{selected.title}</h3>
               </div>
             </div>

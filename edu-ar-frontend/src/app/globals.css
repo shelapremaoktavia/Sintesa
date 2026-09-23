@@ -204,6 +204,8 @@ button { cursor: pointer; }
   font-weight:800; font-size:11px; padding:5px 10px; border-radius:999px; border:1px solid #fcd34d;
   white-space:nowrap;
 }
+.drawer-xp-blue { background:linear-gradient(135deg,#e0f2fe,#bfdbfe); color:#1d4ed8; border-color:#93c5fd; }
+.drawer-xp-dark { background:linear-gradient(135deg,#e2e8f0,#cbd5e1); color:#334155; border-color:#94a3b8; }
 .drawer-nav { padding:14px 14px 4px; display:grid; gap:8px; }
 .drawer-section { margin:10px 14px 0; border:1.5px solid var(--line); border-radius:16px; background:#fbfdff; overflow:hidden; }
 .drawer-sec-head {
