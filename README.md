@@ -13,7 +13,7 @@ mikrokontroler, algoritma & keamanan data — tiap misi ada materi + soal latiha
 - Komponen AR tangguh (`ViewerAR`): loading, fallback model, tombol AR khusus perangkat mendukung
 - Level 1–3 saja (Lv.3 Master Sintesa = MAX, tanpa batas XP); poin tugas guru bisa s.d. 10.000
 - Sistem gamifikasi stabil: materi +100, dilihat +10, TUGAS = poin guru (sekali per tugas), arsip 0 XP; 6 badge, leaderboard live
-- Halaman TUGAS (/tugas) terpisah: siswa kumpulkan per tugas guru, guru nilai + feedback per file
+- Halaman TUGAS (/tugas) terpisah: tugas dikelompokkan per kelas + filter kelas, siswa kumpulkan per tugas guru, guru nilai + feedback per file
 - Pengumpulan guru tampil terpisah: tiap file siswa jadi kartu sendiri (nama, tanggal, nilai, feedback)
 - Tugas bisa dilampiri file penjelas guru (PDF, video, gambar, Word, PPT, maks 15 MB)
 - Preview file terkumpul (gambar & PDF inline) di kartu tugas siswa & guru

@@ -538,6 +538,13 @@ button { cursor: pointer; }
 .due-pill { font-size:11px; font-weight:800; padding:5px 9px; border-radius:999px; background:#fef3c7; color:#92400e; white-space:nowrap; }
 .due-over { background:#fee2e2; color:#b91c1c; }
 .due-done { background:#dcfce7; color:#15803d; }
+/* Kepala grup tugas per kelas di halaman /tugas */
+.tugas-class-head {
+  display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  margin-bottom:12px; padding:14px 16px;
+  background:linear-gradient(135deg,#eaf3ff,#f3ecff); border:1px solid #cfe0f2; border-radius:16px;
+}
+.tugas-class-name { margin:4px 0 0; font-size:19px; font-weight:800; letter-spacing:-.02em; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .quick-links { display:flex; gap:10px; flex-wrap:wrap; }
 
 /* ============ CELEBRATION OVERLAY (sukses & badge) ============ */
