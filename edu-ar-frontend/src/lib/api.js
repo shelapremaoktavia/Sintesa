@@ -36,6 +36,30 @@ export function avatarUrlOf(user) {
   return `${API_URL.replace(/\/api$/, '')}${u}`;
 }
 
+/** Ubah profil sendiri (nama dan/atau password). */
+export async function updateMe(payload) {
+  const { response, data } = await apiFetch('/auth/me', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error(data.message || 'Gagal memperbarui profil.');
+  if (data.user && typeof window !== 'undefined') {
+    const saved = getSavedUser() || {};
+    localStorage.setItem('user', JSON.stringify({ ...saved, ...data.user }));
+  }
+  return data;
+}
+
+/** Gabung kelas dengan kode (murid). Mengembalikan { message, class }. */
+export async function joinClass(code) {
+  const { response, data } = await apiFetch('/classes/join', {
+    method: 'POST',
+    body: JSON.stringify({ code: code.trim().toUpperCase() }),
+  });
+  if (!response.ok) throw new Error(data.message || 'Gagal bergabung ke kelas.');
+  return data;
+}
+
 /** Unggah foto profil baru (gambar, maks 2 MB). Mengembalikan { message, user }. */
 export async function uploadAvatar(file) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;

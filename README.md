@@ -24,6 +24,8 @@ mikrokontroler, algoritma & keamanan data — tiap misi ada materi + soal latiha
 - Halaman LIBRARY (/library) khusus arsip mandiri tanpa XP: gambar, PDF, Word, PPT, Excel, TXT, CSV, ZIP, MP4/MP3
 - Halaman MISI AR (/ar) sendiri: 6 misi + materi & soal latihan per misi + Kelasku (gabung kelas & materi guru)
 - Drawer hamburger kiri: kartu profil (foto, nama, peran, XP/level murid · jumlah kelas guru) + menu + Kelas/Tugas minimize
+- Halaman profil (/profil): header warna + foto + statistik + menu lipat (edit nama/password, kelas, tugas, arsip, keluar)
+- Gabung kelas lain langsung dari drawer & shortcut di /tugas
 - Animasi selebrasi: layar sukses "Horey!" + centang memantul saat tugas terkirim & misi selesai, dan koin badge raksasa ala lempar-koin + kilau + konfeti saat badge baru didapat
 - Daftar Kelas Saya & Tugas Saya di drawer: otomatis minimize (tampilkan 1 + tombol sisanya) bila lebih dari 1
 - Foto profil: unggah gambar (PNG/JPG/WEBP/GIF, maks 2 MB) via tombol 📷 di drawer

@@ -121,7 +121,7 @@ function MyClasses({ user }) {
           title="Materi AR dari gurumu"
           subtitle="Gabung kelas dengan kode, lalu buka materi 3D/AR-nya (+100 XP per misi selesai)."
         />
-        <form onSubmit={join} className="panel join-panel">
+        <form onSubmit={join} id="gabung" className="panel join-panel" style={{ scrollMarginTop: 90 }}>
           <div>
             <h2 className="font-extrabold text-lg m-0">Gabung Kelas Baru</h2>
             <p className="text-sm text-slate-500 mt-1">Masukkan kode kelas dari guru.</p>

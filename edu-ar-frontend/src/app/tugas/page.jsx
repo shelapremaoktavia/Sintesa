@@ -309,6 +309,12 @@ function TugasContent() {
                   </button>
                 );
               })}
+              {user?.role === 'SISWA' && (
+                <Link href="/ar#gabung" className="class-shortcut class-shortcut-join no-underline">
+                  <span className="class-shortcut-cover cover-join">＋</span>
+                  <span className="class-shortcut-text"><strong>Gabung Kelas</strong><small>Pakai kode guru</small></span>
+                </Link>
+              )}
             </div>
           </section>
         )}
