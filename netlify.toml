@@ -1,0 +1,6 @@
+# Konfigurasi deploy Netlify untuk frontend Sintesa (monorepo).
+# Cara pakai: Netlify → Add new site → Import dari GitHub → Base directory
+# otomatis terbaca dari file ini. Tambahkan env NEXT_PUBLIC_API_URL di UI.
+[build]
+  base = "edu-ar-frontend"
+  command = "npm run build"
