@@ -25,12 +25,15 @@ const ALLOWED_MIMES = new Set([
   // arsip & media ringan
   'application/zip', 'application/x-zip-compressed',
   'video/mp4', 'audio/mpeg',
+  // model 3D untuk AR (GLB/GLTF)
+  'model/gltf-binary', 'model/gltf+json',
 ]);
 
 const ALLOWED_EXT = new Set([
   '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg',
   '.pdf', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.txt', '.csv',
   '.zip', '.mp4', '.mp3',
+  '.glb', '.gltf',
 ]);
 
 const storage = multer.diskStorage({
@@ -45,7 +48,7 @@ const storage = multer.diskStorage({
 function fileFilter(req, file, cb) {
   const ext = path.extname(file.originalname || '').toLowerCase();
   if (ALLOWED_MIMES.has(file.mimetype) || ALLOWED_EXT.has(ext)) return cb(null, true);
-  cb(new Error('Tipe file tidak didukung. Gunakan gambar, PDF, Word, PPT, Excel, TXT, ZIP, MP4, atau MP3.'));
+  cb(new Error('Tipe file tidak didukung. Gunakan gambar, PDF, Word, PPT, Excel, TXT, ZIP, MP4, MP3, atau model 3D (GLB/GLTF).'));
 }
 
 const upload = multer({
@@ -111,7 +114,7 @@ const taskStorage = multer.diskStorage({
 function taskFilter(req, file, cb) {
   const ext = path.extname(file.originalname || '').toLowerCase();
   if (ALLOWED_MIMES.has(file.mimetype) || ALLOWED_EXT.has(ext)) return cb(null, true);
-  cb(new Error('Tipe file tidak didukung. Gunakan gambar, PDF, Word, PPT, Excel, TXT, ZIP, MP4, atau MP3.'));
+  cb(new Error('Tipe file tidak didukung. Gunakan gambar, PDF, Word, PPT, Excel, TXT, ZIP, MP4, MP3, atau model 3D (GLB/GLTF).'));
 }
 
 const taskUpload = multer({

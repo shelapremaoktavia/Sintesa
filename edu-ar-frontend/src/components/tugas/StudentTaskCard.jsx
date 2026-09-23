@@ -8,7 +8,7 @@ import { fetchMyGamification } from '../../lib/gamification';
 import { fileAbsoluteUrl, formatDate, formatSize, uploadTaskFile } from '../../lib/library';
 
 const MAX_MB = 15;
-const ACCEPT = '.png,.jpg,.jpeg,.webp,.gif,.svg,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.zip,.mp4,.mp3';
+const ACCEPT = '.png,.jpg,.jpeg,.webp,.gif,.svg,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.zip,.mp4,.mp3,.glb,.gltf';
 
 export function dueInfo(date) {
   if (!date) return null;
