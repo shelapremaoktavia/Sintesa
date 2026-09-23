@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { uploadArchiveFile } from '../../lib/library';
 
 const MAX_MB = 15;
-const ACCEPT = '.png,.jpg,.jpeg,.webp,.gif,.svg,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.zip,.mp4,.mp3';
+const ACCEPT = '.png,.jpg,.jpeg,.webp,.gif,.svg,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.zip,.mp4,.mp3,.glb,.gltf';
 
 /**
  * Upload ARSIP Library mandiri (tanpa tugas, tanpa XP).
@@ -57,7 +57,7 @@ export default function LibraryUploader({ onUploaded }) {
       <div className="lib-upload-head">
         <div>
           <h3>🗂️ Simpan Arsip Pribadi</h3>
-          <p>Gambar, PDF, Word, PPT, Excel, TXT, ZIP, MP4 — maks. {MAX_MB} MB per file. Arsip tidak menambah XP.</p>
+          <p>Gambar, PDF, Word, PPT, Excel, TXT, ZIP, MP4, <strong>model 3D (GLB)</strong> — maks. {MAX_MB} MB per file. Arsip tidak menambah XP.</p>
         </div>
         <span className="xp-chip xp-chip-neutral">0 XP · arsip</span>
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 const MAX_MB = 15;
-const ACCEPT = '.png,.jpg,.jpeg,.webp,.gif,.svg,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.zip,.mp4,.mp3';
+const ACCEPT = '.png,.jpg,.jpeg,.webp,.gif,.svg,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.zip,.mp4,.mp3,.glb,.gltf';
 
 /**
  * Pemilih lampiran tugas guru (PDF, video, gambar, dsb — maks 15 MB).
