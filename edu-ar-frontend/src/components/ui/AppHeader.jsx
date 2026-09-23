@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch, avatarUrlOf, getSavedUser, joinClass, logout, uploadAvatar } from '../../lib/api';
 import { fetchMyGamification, levelForXp } from '../../lib/gamification';
