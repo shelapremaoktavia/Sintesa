@@ -9,11 +9,15 @@ mikrokontroler, algoritma & keamanan data — tiap misi ada materi + soal latiha
 
 ## Fitur yang sudah dirapikan
 - HOME profesional bertema gamifikasi + AR (hero + preview 3D interaktif)
+- Layar sambutan pra-login ala aplikasi: visual brand, banner promo, menu cepat, tombol Login besar
 - Katalog AR RPL: 6 misi Kelas 10 (sistem komputer, jaringan, hardware, mikrokontroler, algoritma, keamanan data)
 - Komponen AR tangguh (`ViewerAR`): loading, fallback model, tombol AR khusus perangkat mendukung
 - Level 1–3 saja (Lv.3 Master Sintesa = MAX, tanpa batas XP); poin tugas guru bisa s.d. 10.000
 - Sistem gamifikasi stabil: materi +100, dilihat +10, TUGAS = poin guru (sekali per tugas), arsip 0 XP; 6 badge, leaderboard live
 - Halaman TUGAS (/tugas) terpisah: tugas dikelompokkan per kelas + filter kelas, siswa kumpulkan per tugas guru, guru nilai + feedback per file
+- Shortcut kartu kelas di atas halaman Tugas + tautan langsung buat tugas per kelas (guru)
+- Halaman dalam kelas (/kelas/[id]) ala forum kelas: banner + tab Forum/Tugas/Misi AR + kartu Mendatang + linimasa
+- Logo Sintesa di header mengarah ke dashboard (bukan beranda) saat sudah login
 - Pengumpulan guru tampil terpisah: tiap file siswa jadi kartu sendiri (nama, tanggal, nilai, feedback)
 - Tugas bisa dilampiri file penjelas guru (PDF, video, gambar, Word, PPT, maks 15 MB)
 - Preview file terkumpul (gambar & PDF inline) di kartu tugas siswa & guru
