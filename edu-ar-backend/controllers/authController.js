@@ -95,6 +95,42 @@ exports.getMe = async (req, res) => {
   }
 };
 
+// PATCH /api/auth/me — ubah nama dan/atau password sendiri
+exports.updateMe = async (req, res) => {
+  try {
+    const { name, currentPassword, newPassword } = req.body;
+    const data = {};
+
+    if (name !== undefined) {
+      if (!name?.trim()) return res.status(400).json({ message: 'Nama tidak boleh kosong' });
+      data.name = name.trim().slice(0, 80);
+    }
+
+    if (newPassword !== undefined && newPassword !== '') {
+      if (!currentPassword) {
+        return res.status(400).json({ message: 'Password lama wajib diisi untuk ganti password' });
+      }
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: 'Password baru minimal 6 karakter' });
+      }
+      const current = await prisma.user.findUnique({ where: { id: req.user.userId } });
+      if (!current) return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
+      const ok = await bcrypt.compare(currentPassword, current.password);
+      if (!ok) return res.status(401).json({ message: 'Password lama salah' });
+      data.password = await bcrypt.hash(newPassword, 10);
+    }
+
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({ message: 'Tidak ada perubahan' });
+    }
+
+    const updated = await prisma.user.update({ where: { id: req.user.userId }, data });
+    res.json({ message: 'Profil diperbarui', user: publicUser(updated) });
+  } catch (error) {
+    res.status(500).json({ message: 'Gagal memperbarui profil', error: error.message });
+  }
+};
+
 // POST /api/auth/avatar — unggah foto profil (multipart: avatar, maks 2 MB)
 exports.uploadAvatar = async (req, res) => {
   try {

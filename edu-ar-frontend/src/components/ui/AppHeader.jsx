@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiFetch, avatarUrlOf, getSavedUser, logout, uploadAvatar } from '../../lib/api';
+import { apiFetch, avatarUrlOf, getSavedUser, joinClass, logout, uploadAvatar } from '../../lib/api';
 import { fetchMyGamification, levelForXp } from '../../lib/gamification';
 import { fetchMyAssignments } from '../../lib/library';
 
@@ -58,6 +58,11 @@ export default function AppHeader({ active = '' }) {
   const [metaLoaded, setMetaLoaded] = useState(false);
   const [avatarBusy, setAvatarBusy] = useState(false);
   const [avatarError, setAvatarError] = useState('');
+  const [joinOpen, setJoinOpen] = useState(false);
+  const [joinCode, setJoinCode] = useState('');
+  const [joinBusy, setJoinBusy] = useState(false);
+  const [joinMsg, setJoinMsg] = useState('');
+  const [joinError, setJoinError] = useState('');
   const avatarInputRef = useRef(null);
 
   useEffect(() => {
@@ -82,37 +87,57 @@ export default function AppHeader({ active = '' }) {
 
   // Muat daftar kelas & tugas saat drawer pertama kali dibuka (agar ringan).
   // ADMIN tidak butuh data ini.
-  useEffect(() => {
-    if (!open || !user || metaLoaded) return;
-    if (user.role !== 'GURU' && user.role !== 'SISWA') {
+  const loadMeta = useCallback(async () => {
+    if (!user || (user.role !== 'GURU' && user.role !== 'SISWA')) {
       setMetaLoaded(true);
       return;
     }
     let cancelled = false;
-    (async () => {
-      try {
-        if (user.role === 'GURU') {
-          const { response, data } = await apiFetch('/classes/my-classes');
-          if (!cancelled && response.ok && Array.isArray(data)) {
-            setClasses(data.map((c) => ({ id: c.id, name: c.name, code: c.code })));
-          }
-        } else {
-          const [clsRes, tugas] = await Promise.all([
-            apiFetch('/classes/student-classes'),
-            fetchMyAssignments().catch(() => []),
-          ]);
-          if (cancelled) return;
-          if (clsRes.response.ok && Array.isArray(clsRes.data)) {
-            setClasses(clsRes.data.map((c) => ({ id: c.id, name: c.name, code: c.code })));
-          }
-          setTasks(Array.isArray(tugas) ? tugas : []);
+    const done = () => { if (!cancelled) setMetaLoaded(true); };
+    try {
+      if (user.role === 'GURU') {
+        const { response, data } = await apiFetch('/classes/my-classes');
+        if (!cancelled && response.ok && Array.isArray(data)) {
+          setClasses(data.map((c) => ({ id: c.id, name: c.name, code: c.code })));
         }
-      } finally {
-        if (!cancelled) setMetaLoaded(true);
+      } else {
+        const [clsRes, tugas] = await Promise.all([
+          apiFetch('/classes/student-classes'),
+          fetchMyAssignments().catch(() => []),
+        ]);
+        if (cancelled) return;
+        if (clsRes.response.ok && Array.isArray(clsRes.data)) {
+          setClasses(clsRes.data.map((c) => ({ id: c.id, name: c.name, code: c.code })));
+        }
+        setTasks(Array.isArray(tugas) ? tugas : []);
       }
-    })();
+    } finally {
+      done();
+    }
     return () => { cancelled = true; };
-  }, [open, user, metaLoaded]);
+  }, [user]);
+
+  useEffect(() => {
+    if (!open || !user || metaLoaded) return;
+    loadMeta();
+  }, [open, user, metaLoaded, loadMeta]);
+
+  const handleJoin = async (e) => {
+    e.preventDefault();
+    if (!joinCode.trim() || joinBusy) return;
+    setJoinBusy(true); setJoinError(''); setJoinMsg('');
+    try {
+      const data = await joinClass(joinCode);
+      setJoinMsg(data.message || 'Berhasil bergabung!');
+      setJoinCode('');
+      setMetaLoaded(false);
+      await loadMeta();
+    } catch (err) {
+      setJoinError(err.message || 'Gagal bergabung.');
+    } finally {
+      setJoinBusy(false);
+    }
+  };
 
   const handleAvatar = async (file) => {
     setAvatarError('');
@@ -244,7 +269,7 @@ export default function AppHeader({ active = '' }) {
                   onChange={(e) => handleAvatar(e.target.files?.[0])}
                 />
               </span>
-              <Link href={dashboardHref} className="drawer-profile-text no-underline" onClick={close} title="Lihat dashboard">
+              <Link href="/profil" className="drawer-profile-text no-underline" onClick={close} title="Buka profil saya">
                 <strong>{user?.name}</strong>
                 <small>{roleLabel} · Kelas 10 RPL</small>
                 {user?.role === 'SISWA' && (
@@ -325,6 +350,34 @@ export default function AppHeader({ active = '' }) {
                   }}
                 />
               )}
+              {user.role === 'SISWA' && (
+                <>
+                  <button
+                    type="button"
+                    className="drawer-join-toggle"
+                    aria-expanded={joinOpen}
+                    onClick={() => { setJoinOpen((v) => !v); setJoinError(''); setJoinMsg(''); }}
+                  >
+                    {joinOpen ? '▲ Tutup' : '＋ Gabung Kelas Lain'}
+                  </button>
+                  {joinOpen && (
+                    <form onSubmit={handleJoin} className="drawer-join-form">
+                      <input
+                        className="input uppercase"
+                        placeholder="Kode kelas"
+                        value={joinCode}
+                        onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                        maxLength={12}
+                      />
+                      <button className="btn btn-primary btn-sm" disabled={joinBusy || !joinCode.trim()}>
+                        {joinBusy ? '…' : 'Gabung'}
+                      </button>
+                      {joinError && <p className="drawer-join-err">{joinError}</p>}
+                      {joinMsg && <p className="drawer-join-ok">{joinMsg}</p>}
+                    </form>
+                  )}
+                </>
+              )}
             </>
           )}
         </div>
@@ -338,10 +391,10 @@ export default function AppHeader({ active = '' }) {
                 ) : (
                   <div className="avatar">{initial}</div>
                 )}
-                <div>
+                <Link href="/profil" className="no-underline text-inherit" onClick={close} title="Buka profil saya">
                   <div className="text-sm font-bold">{user?.name}</div>
-                  <div className="text-xs text-slate-400">{roleLabel}</div>
-                </div>
+                  <div className="text-xs text-slate-400">{roleLabel} · Profil →</div>
+                </Link>
               </div>
               <button className="btn btn-soft w-full" onClick={() => { close(); logout(router); }}>Keluar</button>
             </>
