@@ -1,13 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AppHeader from '../../components/ui/AppHeader';
 import TaskAttachmentBox from '../../components/tugas/TaskAttachmentBox';
 import FilePreview from '../../components/tugas/FilePreview';
 import { SuccessOverlay, BadgeOverlay, diffBadges } from '../../components/ui/Celebration';
-import { getSavedUser } from '../../lib/api';
+import { getSavedUser, apiFetch } from '../../lib/api';
 import { fetchMyGamification } from '../../lib/gamification';
 import {
   deleteLibraryFile, fetchLibrary, fetchMyAssignments,
@@ -268,20 +268,28 @@ export default function TugasPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [tasks, setTasks] = useState([]);
+  const [classes, setClasses] = useState([]);
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('semua');
+  const [classFilter, setClassFilter] = useState('semua');
 
   const load = useCallback(async () => {
     setError('');
     try {
-      const [tugas, arsip] = await Promise.all([
+      const saved = getSavedUser();
+      const classPath = saved?.role === 'GURU' ? '/classes/my-classes' : '/classes/student-classes';
+      const [tugas, arsip, clsRes] = await Promise.all([
         fetchMyAssignments(),
         fetchLibrary().catch(() => []),
+        apiFetch(classPath).catch(() => ({ response: { ok: false }, data: [] })),
       ]);
       setTasks(tugas);
       setFiles(arsip.filter((f) => f.assignmentId || f.assignment));
+      if (clsRes.response?.ok && Array.isArray(clsRes.data)) {
+        setClasses(clsRes.data.filter((c) => c && c.id));
+      }
     } catch (err) {
       setError(err.message || 'Gagal memuat tugas.');
     } finally {
@@ -298,18 +306,57 @@ export default function TugasPage() {
   }, [router, load]);
 
   const filesByTask = (taskId) => files.filter((f) => (f.assignmentId || f.assignment?.id) === taskId);
+  const isDone = (t) => Boolean(t.submissions?.length || filesByTask(t.id).length);
 
   const visible = tasks.filter((t) => {
-    if (filter === 'belum') return !(t.submissions?.length || filesByTask(t.id).length);
-    if (filter === 'sudah') return (t.submissions?.length || filesByTask(t.id).length);
+    if (classFilter !== 'semua' && (t.classId || t.class?.id) !== classFilter) return false;
+    if (filter === 'belum') return !isDone(t);
+    if (filter === 'sudah') return isDone(t);
     return true;
   });
 
-  const doneCount = tasks.filter((t) => (t.submissions?.length || filesByTask(t.id).length)).length;
-  const totalXp = tasks.reduce((s, t) => {
-    const done = t.submissions?.length || filesByTask(t.id).length;
-    return done ? s + (Number(t.points) || 100) : s;
-  }, 0);
+  // Kelompokkan tugas per kelas agar guru & murid jelas melihat tugas tiap kelas.
+  const grouped = useMemo(() => {
+    const order = classes.map((c) => c.id);
+    const map = new Map();
+    const keyOf = (t) => t.classId || t.class?.id || 'tanpa-kelas';
+    for (const t of visible) {
+      const cid = keyOf(t);
+      if (!map.has(cid)) {
+        map.set(cid, {
+          id: cid,
+          name: t.class?.name || classes.find((c) => c.id === cid)?.name || 'Tanpa kelas',
+          code: t.class?.code || classes.find((c) => c.id === cid)?.code || '',
+          tasks: [],
+        });
+      }
+      map.get(cid).tasks.push(t);
+    }
+    // Kelas yang dipilih tapi belum punya tugas tetap tampil (dengan CTA buat tugas utk guru).
+    if (classFilter !== 'semua' && !map.has(classFilter)) {
+      const c = classes.find((x) => x.id === classFilter);
+      if (c) map.set(classFilter, { id: c.id, name: c.name, code: c.code || '', tasks: [] });
+    }
+    const rank = (id) => (order.includes(id) ? order.indexOf(id) : order.length);
+    return [...map.values()].sort((a, b) => rank(a.id) - rank(b.id));
+  }, [visible, classes, classFilter]);
+
+  const renderCard = (t) => (
+    user?.role === 'GURU' ? (
+      <TeacherTaskCard
+        key={t.id}
+        task={t}
+        files={filesByTask(t.id)}
+        onGrade={async (id, p) => { await gradeLibraryFile(id, p); await load(); }}
+        onDelete={async (id) => { await deleteLibraryFile(id); await load(); }}
+      />
+    ) : (
+      <StudentTaskCard key={t.id} task={t} files={[...(t.submissions || []), ...filesByTask(t.id)].filter((v, i, a) => a.findIndex((x) => x.id === v.id) === i)} onUploaded={load} />
+    )
+  );
+
+  const doneCount = tasks.filter(isDone).length;
+  const totalXp = tasks.reduce((s, t) => (isDone(t) ? s + (Number(t.points) || 100) : s), 0);
 
   if (!user && loading) return <main className="page-loading">Membuka tugas…</main>;
 
@@ -354,28 +401,59 @@ export default function TugasPage() {
           <button className="btn btn-soft btn-sm" onClick={load}>🔄 Muat ulang</button>
         </div>
 
+        {classes.length > 1 && (
+          <div className="panel library-toolbar">
+            <strong className="text-sm">🏫 Kelas:</strong>
+            <div className="library-pills">
+              <button onClick={() => setClassFilter('semua')} className={`pill-btn ${classFilter === 'semua' ? 'pill-active' : ''}`}>
+                Semua Kelas
+              </button>
+              {classes.map((c) => (
+                <button key={c.id} onClick={() => setClassFilter(c.id)} className={`pill-btn ${classFilter === c.id ? 'pill-active' : ''}`}>
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <div className="panel empty">⏳ Memuat tugas…</div>
         ) : visible.length === 0 ? (
           <div className="panel empty">
             <div className="text-4xl mb-3">📌</div>
             <h3 className="font-extrabold text-lg text-slate-700">{tasks.length === 0 ? 'Belum ada tugas' : 'Tidak ada tugas pada filter ini'}</h3>
-            <p className="text-sm mt-1">{tasks.length === 0 ? (user?.role === 'GURU' ? 'Buat tugas dari dashboard guru.' : 'Minta gurumu membuat tugas di kelas.') : 'Coba filter lain.'}</p>
+            <p className="text-sm mt-1">{tasks.length === 0 ? (user?.role === 'GURU' ? 'Buat tugas dari dashboard guru atau halaman kelas.' : 'Minta gurumu membuat tugas di kelas.') : 'Coba filter lain.'}</p>
           </div>
         ) : (
-          <div className="grid gap-5" style={{ gridTemplateColumns: '1fr', maxWidth: 860 }}>
-            {visible.map((t) => (
-              user?.role === 'GURU' ? (
-                <TeacherTaskCard
-                  key={t.id}
-                  task={t}
-                  files={filesByTask(t.id)}
-                  onGrade={async (id, p) => { await gradeLibraryFile(id, p); await load(); }}
-                  onDelete={async (id) => { await deleteLibraryFile(id); await load(); }}
-                />
-              ) : (
-                <StudentTaskCard key={t.id} task={t} files={[...(t.submissions || []), ...filesByTask(t.id)].filter((v, i, a) => a.findIndex((x) => x.id === v.id) === i)} onUploaded={load} />
-              )
+          <div className="grid gap-6" style={{ gridTemplateColumns: '1fr', maxWidth: 860 }}>
+            {grouped.map((g) => (
+              <section key={g.id}>
+                <div className="tugas-class-head">
+                  <div>
+                    <span className="eyebrow">🏫 KELAS</span>
+                    <h2 className="tugas-class-name">
+                      {g.name} {g.code && <span className="meta-chip">Kode {g.code}</span>}
+                    </h2>
+                  </div>
+                  <span className="flex gap-2 items-center flex-wrap">
+                    <span className="meta-chip">{g.tasks.length} tugas</span>
+                    {user?.role === 'GURU' && g.id !== 'tanpa-kelas' && (
+                      <Link href={`/guru/kelas/${g.id}`} className="btn btn-primary btn-sm">＋ Tugas Baru</Link>
+                    )}
+                  </span>
+                </div>
+                {g.tasks.length === 0 ? (
+                  <div className="panel empty" style={{ padding: 20 }}>
+                    Belum ada tugas di kelas ini.
+                    {user?.role === 'GURU' && g.id !== 'tanpa-kelas' && (
+                      <div><Link href={`/guru/kelas/${g.id}`} className="btn btn-primary btn-sm mt-3">＋ Buat Tugas di Kelas Ini</Link></div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid gap-5">{g.tasks.map(renderCard)}</div>
+                )}
+              </section>
             ))}
           </div>
         )}
