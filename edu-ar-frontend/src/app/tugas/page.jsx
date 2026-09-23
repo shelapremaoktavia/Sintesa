@@ -1,147 +1,17 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import AppHeader from '../../components/ui/AppHeader';
 import TaskAttachmentBox from '../../components/tugas/TaskAttachmentBox';
 import FilePreview from '../../components/tugas/FilePreview';
-import { SuccessOverlay, BadgeOverlay, diffBadges } from '../../components/ui/Celebration';
+import StudentTaskCard from '../../components/tugas/StudentTaskCard';
 import { getSavedUser, apiFetch } from '../../lib/api';
-import { fetchMyGamification } from '../../lib/gamification';
 import {
   deleteLibraryFile, fetchLibrary, fetchMyAssignments,
-  fileAbsoluteUrl, formatDate, formatSize, gradeLibraryFile, uploadTaskFile,
+  fileAbsoluteUrl, formatDate, formatSize, gradeLibraryFile,
 } from '../../lib/library';
-
-const MAX_MB = 15;
-const ACCEPT = '.png,.jpg,.jpeg,.webp,.gif,.svg,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.zip,.mp4,.mp3';
-
-function dueInfo(date) {
-  if (!date) return null;
-  const diff = new Date(date) - new Date();
-  if (diff < 0) return { label: 'Terlambat', cls: 'due-over' };
-  const days = Math.ceil(diff / 86400000);
-  if (days === 0) return { label: 'Hari ini!', cls: '' };
-  if (days === 1) return { label: 'Besok', cls: '' };
-  return { label: `${days} hari lagi`, cls: '' };
-}
-
-/** Kartu satu tugas untuk SISWA: status + file terkumpul + form upload khusus tugas. */
-function StudentTaskCard({ task, files, onUploaded }) {
-  const inputRef = useRef(null);
-  const [file, setFile] = useState(null);
-  const [note, setNote] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const [ok, setOk] = useState('');
-  const [success, setSuccess] = useState(null);
-  const [newBadges, setNewBadges] = useState([]);
-  const [preview, setPreview] = useState(null);
-
-  const submitted = files.length > 0;
-  const points = Number(task.points) || 100;
-  const due = dueInfo(task.dueDate);
-  const graded = files.find((f) => f.grade !== null && f.grade !== undefined);
-
-  const pick = (f) => {
-    setError(''); setOk('');
-    if (!f) return;
-    if (f.size > MAX_MB * 1024 * 1024) {
-      setError(`Ukuran file maksimal ${MAX_MB} MB.`);
-      return;
-    }
-    setFile(f);
-  };
-
-  const submit = async (e) => {
-    e.preventDefault();
-    if (!file || busy) return;
-    setBusy(true); setError(''); setOk('');
-    const firstTime = !submitted;
-    const prevBadges = (await fetchMyGamification().catch(() => null))?.badges ?? [];
-    try {
-      const res = await uploadTaskFile({ file, assignment: task, description: note.trim() || undefined });
-      const xp = res.earnedXp ?? points;
-      setOk(`Terkumpul! +${xp} XP masuk 🎉${submitted ? ' (tugas ini sudah dinilai sekali, upload tambahan tidak menambah XP lagi)' : ''}`);
-      setFile(null); setNote('');
-      if (inputRef.current) inputRef.current.value = '';
-      onUploaded?.();
-      const nextBadges = (await fetchMyGamification().catch(() => null))?.badges ?? [];
-      setNewBadges(diffBadges(prevBadges, nextBadges));
-      setSuccess({ xp, firstTime });
-    } catch (err) {
-      setError(err.message || 'Gagal mengumpulkan tugas.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const closeSuccess = () => setSuccess(null);
-
-  return (
-    <>
-    <article className="panel p-5">
-      <div className="assign-head">
-        <div>
-          <div className="eyebrow">{task.class?.name || 'Kelas'} {task.material ? `· ${task.material.title}` : ''}</div>
-          <h3 className="font-extrabold text-lg mt-1">{task.title}</h3>
-        </div>
-        <span className={`due-pill ${submitted ? 'due-done' : due?.cls || ''}`}>
-          {submitted ? `✓ Terkumpul · +${points} XP` : due ? due.label : `+${points} XP`}
-        </span>
-      </div>
-      {task.description && <p className="text-sm text-slate-500 leading-6">{task.description}</p>}
-      <TaskAttachmentBox task={task} />
-
-      {files.length > 0 && (
-        <div className="mt-3 grid gap-2">
-          {files.map((f) => (
-            <div key={f.id} className="rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-sm flex items-center justify-between gap-2 flex-wrap">
-              <span className="font-bold truncate">📄 {f.originalName} <span className="font-normal text-slate-400">· {formatSize(f.sizeKb)} · {formatDate(f.createdAt)}</span></span>
-              <span className="flex gap-2">
-                <button className="btn btn-soft btn-sm" onClick={() => setPreview(f)}>👁️ Preview</button>
-                <a className="btn btn-soft btn-sm" href={fileAbsoluteUrl(f)} target="_blank" rel="noreferrer" download>⬇️</a>
-                {f.grade !== null && f.grade !== undefined && <span className="due-pill due-done">★ {f.grade}</span>}
-              </span>
-            </div>
-          ))}
-          {graded?.feedback && <div className="library-feedback">💬 Guru: {graded.feedback}</div>}
-        </div>
-      )}
-
-      <form onSubmit={submit} className="mt-4">
-        {error && <div className="toast-error">{error}</div>}
-        {ok && <div className="toast-ok">{ok}</div>}
-        <div className="flex gap-2 flex-wrap">
-          <button type="button" onClick={() => inputRef.current?.click()} className={`dropzone ${file ? 'dropzone-filled' : ''}`} style={{ marginBottom: 0, padding: '14px' }}>
-            <strong>{file ? `📄 ${file.name}` : submitted ? '＋ Tambah / revisi file' : '📤 Pilih file tugas'}</strong>
-            <small>Maks. {MAX_MB} MB · PNG/JPG/PDF/DOC/PPT/XLS/ZIP/MP4</small>
-          </button>
-          <input ref={inputRef} type="file" accept={ACCEPT} className="hidden-input" onChange={(e) => pick(e.target.files?.[0])} />
-        </div>
-        <div className="flex gap-2 mt-3 flex-wrap">
-          <input className="input" style={{ flex: 1, minWidth: 200 }} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Catatan (opsional)" maxLength={280} />
-          <button className="btn btn-primary" disabled={!file || busy}>{busy ? 'Mengumpulkan…' : submitted ? 'Kumpulkan Revisi' : `Kumpulkan (+${points} XP)`}</button>
-        </div>
-      </form>
-    </article>
-    {success && (
-      <SuccessOverlay
-        title="Horey!"
-        subtitle={`Tugas “${task.title}” telah terkirim`}
-        xpText={success.firstTime ? `+${success.xp} XP masuk` : 'Revisi tersimpan'}
-        buttonLabel={newBadges.length > 0 ? 'Lihat Badge 🎖' : 'Kembali ke Tugas'}
-        onClose={closeSuccess}
-      />
-    )}
-    {!success && newBadges.length > 0 && (
-      <BadgeOverlay badges={newBadges} onClose={() => setNewBadges([])} />
-    )}
-    <FilePreview file={preview} onClose={() => setPreview(null)} />
-    </>
-  );
-}
 
 /** Kartu satu tugas untuk GURU: daftar file masuk + nilai per file. */
 function TeacherTaskCard({ task, files, onGrade, onDelete }) {
@@ -265,7 +135,16 @@ function TeacherTaskCard({ task, files, onGrade, onDelete }) {
  * Library (/library) khusus arsip mandiri (0 XP), tanpa nilai.
  */
 export default function TugasPage() {
+  return (
+    <Suspense fallback={<main className="page-loading">Membuka tugas…</main>}>
+      <TugasContent />
+    </Suspense>
+  );
+}
+
+function TugasContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [user, setUser] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [classes, setClasses] = useState([]);
@@ -273,7 +152,7 @@ export default function TugasPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('semua');
-  const [classFilter, setClassFilter] = useState('semua');
+  const [classFilter, setClassFilter] = useState(() => searchParams.get('kelas') || 'semua');
 
   const load = useCallback(async () => {
     setError('');
@@ -401,20 +280,37 @@ export default function TugasPage() {
           <button className="btn btn-soft btn-sm" onClick={load}>🔄 Muat ulang</button>
         </div>
 
-        {classes.length > 1 && (
-          <div className="panel library-toolbar">
-            <strong className="text-sm">🏫 Kelas:</strong>
-            <div className="library-pills">
-              <button onClick={() => setClassFilter('semua')} className={`pill-btn ${classFilter === 'semua' ? 'pill-active' : ''}`}>
-                Semua Kelas
-              </button>
-              {classes.map((c) => (
-                <button key={c.id} onClick={() => setClassFilter(c.id)} className={`pill-btn ${classFilter === c.id ? 'pill-active' : ''}`}>
-                  {c.name}
-                </button>
-              ))}
+        {classes.length > 0 && (
+          <section className="mb-3">
+            <div className="section-head">
+              <div>
+                <h2 className="section-title">🏫 Shortcut Kelas</h2>
+                <p className="section-subtitle">Pilih kelas untuk melihat tugas yang sedang berjalan di kelas itu.</p>
+              </div>
             </div>
-          </div>
+            <div className="class-shortcut-row">
+              <button
+                onClick={() => setClassFilter('semua')}
+                className={`class-shortcut ${classFilter === 'semua' ? 'class-shortcut-active' : ''}`}
+              >
+                <span className="class-shortcut-icon">🌍</span>
+                <span className="class-shortcut-text"><strong>Semua Kelas</strong><small>{tasks.length} tugas</small></span>
+              </button>
+              {classes.map((c, i) => {
+                const n = tasks.filter((t) => (t.classId || t.class?.id) === c.id).length;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setClassFilter(classFilter === c.id ? 'semua' : c.id)}
+                    className={`class-shortcut ${classFilter === c.id ? 'class-shortcut-active' : ''}`}
+                  >
+                    <span className={`class-shortcut-cover cover-${i % 3}`}>{(c.name || 'K').charAt(0).toUpperCase()}</span>
+                    <span className="class-shortcut-text"><strong>{c.name}</strong><small>{c.code} · {n} tugas</small></span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
         )}
 
         {loading ? (

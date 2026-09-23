@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import AppHeader from '../components/ui/AppHeader';
 import HeroGamifikasi from '../components/home/HeroGamifikasi';
+import WelcomeSplash from '../components/home/WelcomeSplash';
 import GamifikasiFeatures from '../components/home/GamifikasiFeatures';
 import ARShowcase from '../components/home/ARShowcase';
 import LeaderboardSection from '../components/home/LeaderboardSection';
@@ -12,8 +13,8 @@ import { getSavedUser } from '../lib/api';
 
 /**
  * HOME Sintesa — landing page profesional bertema gamifikasi + AR.
- * - Publik: pengunjung belum login melihat penawaran & CTA daftar
- * - Login: tombol adaptif menuju dashboard + library
+ * - Tamu (belum login): layar sambutan ala aplikasi + info publik di bawahnya
+ * - Login: hero adaptif menuju dashboard + library
  * - Memuat komponen AR interaktif per pelajaran (ARShowcase + Hero preview)
  */
 export default function Home() {
@@ -33,7 +34,7 @@ export default function Home() {
     <div className="landing">
       <AppHeader active="home" />
       <main>
-        <HeroGamifikasi user={user} />
+        {user ? <HeroGamifikasi user={user} /> : <WelcomeSplash />}
         <GamifikasiFeatures />
         <ARShowcase />
         <LeaderboardSection />

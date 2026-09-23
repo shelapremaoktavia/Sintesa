@@ -143,6 +143,7 @@ function MyClasses({ user }) {
                   <h2 className="section-title">{c.name}</h2>
                   <p className="section-subtitle">Guru: {c.teacher?.name || '—'} · Kode {c.code}</p>
                 </div>
+                <Link href={`/kelas/${c.id}`} className="btn btn-primary btn-sm">Buka Kelas →</Link>
               </div>
               {(c.materials?.length || 0) === 0 ? (
                 <div className="panel empty">Guru belum membagikan materi di kelas ini.</div>

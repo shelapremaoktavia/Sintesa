@@ -138,6 +138,7 @@ export default function AppHeader({ active = '' }) {
   };
 
   const dashboardHref = user?.role === 'ADMIN' ? '/admin' : user?.role === 'GURU' ? '/guru' : '/siswa';
+  const brandHref = user ? dashboardHref : '/';
   const roleLabel = user?.role === 'ADMIN' ? 'Admin' : user?.role === 'GURU' ? 'Guru' : 'Murid';
   const linkCls = (key) => `drawer-link ${active === key ? 'drawer-link-active' : ''}`;
   const close = () => setOpen(false);
@@ -169,7 +170,7 @@ export default function AppHeader({ active = '' }) {
               <span aria-hidden="true" />
               <span aria-hidden="true" />
             </button>
-            <Link href="/" className="brand" onClick={close}>
+            <Link href={brandHref} className="brand" onClick={close}>
               <span className="brand-mark">✦</span>
               <span>Sin<span>tesa</span></span>
             </Link>
@@ -209,10 +210,10 @@ export default function AppHeader({ active = '' }) {
       {/* Drawer kiri */}
       <aside className={`drawer ${open ? 'drawer-open' : ''}`} aria-hidden={!open} aria-label="Menu navigasi">
         <div className="drawer-head">
-          <span className="brand">
+          <Link href={brandHref} className="brand no-underline" onClick={close}>
             <span className="brand-mark">✦</span>
             <span>Sin<span>tesa</span></span>
-          </span>
+          </Link>
           <button type="button" className="drawer-close" aria-label="Tutup menu" onClick={close}>✕</button>
         </div>
 
@@ -289,7 +290,7 @@ export default function AppHeader({ active = '' }) {
                 renderItem={(c) => (
                   <Link
                     key={c.id}
-                    href={user.role === 'GURU' ? `/guru/kelas/${c.id}` : '/ar'}
+                    href={user.role === 'GURU' ? `/guru/kelas/${c.id}` : `/kelas/${c.id}`}
                     className="drawer-sub"
                     onClick={close}
                   >
