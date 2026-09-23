@@ -20,7 +20,7 @@ export default function LoginPage() {
       if (!res.ok) { setError(data.message || 'Email atau password salah.'); setLoading(false); return; }
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      router.replace(data.user.role === 'GURU' ? '/guru' : '/siswa');
+      router.replace(data.user.role === 'ADMIN' ? '/admin' : data.user.role === 'GURU' ? '/guru' : '/siswa');
     } catch {
       setError('Tidak bisa terhubung ke server backend. Pastikan backend sedang berjalan.');
     } finally { setLoading(false); }

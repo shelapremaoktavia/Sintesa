@@ -4,32 +4,33 @@ import { useState } from 'react';
 import Link from 'next/link';
 import ViewerAR from '../ARViewer/ViewerAR';
 import { SectionHeading } from '../ui/badges';
-import { AR_CATALOG } from '../../lib/arCatalog';
+import { AR_CATALOG, KELAS_FOKUS, arSubjects } from '../../lib/arCatalog';
 
 /**
- * Katalog AR interaktif di HOME: pilih pelajaran → model 3D/AR + misi + instruksi tampil.
+ * Katalog AR interaktif di HOME: pilih misi RPL → model 3D/AR + misi + instruksi tampil.
  * Versi lengkap (materi + soal tiap misi) ada di halaman /ar.
  * Satu <ViewerAR> aktif dalam satu waktu agar ringan dan bebas error.
  */
 export default function ARShowcase() {
   const [selected, setSelected] = useState(AR_CATALOG[0]);
-  const [jenjang, setJenjang] = useState('Semua');
+  const [mapel, setMapel] = useState('Semua');
 
-  const filtered = jenjang === 'Semua' ? AR_CATALOG : AR_CATALOG.filter((a) => a.jenjang === jenjang);
+  const subjects = ['Semua', ...arSubjects()];
+  const filtered = mapel === 'Semua' ? AR_CATALOG : AR_CATALOG.filter((a) => a.subject === mapel);
 
   return (
     <section id="katalog-ar" className="landing-section landing-alt">
       <div className="landing-container">
         <SectionHeading
-          eyebrow="🧊 KATALOG AR PER PELAJARAN"
+          eyebrow={`🧊 KATALOG AR · ${KELAS_FOKUS.toUpperCase()} SMK`}
           title="Pilih misimu, hadirkan modelnya dalam AR"
-          subtitle="Setiap pelajaran punya model 3D tematik + misi XP. Klik kartu untuk mengganti preview interaktif di samping."
+          subtitle="6 misi RPL dengan model 3D tematik + misi XP. Klik kartu untuk mengganti preview interaktif di samping."
         />
 
         <div className="ar-filter">
-          {['Semua', 'SD', 'SMP', 'SMA'].map((j) => (
-            <button key={j} onClick={() => setJenjang(j)} className={`pill-btn ${jenjang === j ? 'pill-active' : ''}`}>
-              {j === 'Semua' ? '🌍 Semua Jenjang' : `🎓 ${j}`}
+          {subjects.map((s) => (
+            <button key={s} onClick={() => setMapel(s)} className={`pill-btn ${mapel === s ? 'pill-active' : ''}`}>
+              {s === 'Semua' ? '🌍 Semua Mapel' : `📚 ${s}`}
             </button>
           ))}
         </div>
@@ -45,7 +46,7 @@ export default function ARShowcase() {
                 <span className="ar-item-emoji" style={{ background: item.gradient }}>{item.emoji}</span>
                 <span className="ar-item-text">
                   <strong>{item.title}</strong>
-                  <small>{item.jenjang} · {item.subject} · +{item.xp} XP</small>
+                  <small>{item.kelas} · {item.subject} · +{item.xp} XP</small>
                 </span>
                 <span className="ar-item-arrow">→</span>
               </button>
@@ -56,7 +57,7 @@ export default function ARShowcase() {
             <div className="ar-preview-head">
               <span className="ar-item-emoji" style={{ background: selected.gradient }}>{selected.emoji}</span>
               <div>
-                <div className="eyebrow">{selected.jenjang} · {selected.subject} · +{selected.xp} XP</div>
+                <div className="eyebrow">{selected.kelas} · {selected.subject} · +{selected.xp} XP</div>
                 <h3 className="ar-preview-title">{selected.title}</h3>
               </div>
             </div>

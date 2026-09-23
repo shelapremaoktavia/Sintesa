@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'SISWA' });
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,14 +31,14 @@ export default function RegisterPage() {
         <div className="auth-logo">✦ Sintesa</div>
         <div className="auth-copy">
           <h1>Buat ruang belajar interaktifmu.</h1>
-          <p>Daftar sebagai guru atau siswa dan gunakan satu platform untuk belajar dengan materi visual 3D dan Augmented Reality.</p>
+          <p>Daftar sebagai murid Kelas 10 RPL dan gunakan satu platform untuk belajar dengan materi visual 3D dan Augmented Reality.</p>
         </div>
         <div className="text-xs text-white/60">Belajar · Berkreasi · Berinteraksi</div>
       </section>
       <section className="auth-box">
         <form onSubmit={handleSubmit} className="panel auth-card">
-          <h1>Buat akun</h1>
-          <p className="muted">Isi data berikut untuk mulai menggunakan Sintesa.</p>
+          <h1>Buat akun murid</h1>
+          <p className="muted">Pendaftaran terbuka untuk murid Kelas 10 RPL. Akun guru dibuatkan oleh admin.</p>
           {error && <div className="toast-error">{error}</div>}
           <div className="form-group">
             <label className="form-label">Nama Lengkap</label>
@@ -52,13 +52,7 @@ export default function RegisterPage() {
             <label className="form-label">Password</label>
             <input className="input" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Minimal 6 karakter" required minLength={6} />
           </div>
-          <div className="form-group">
-            <label className="form-label">Daftar sebagai</label>
-            <select className="input" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
-              <option value="SISWA">Siswa</option><option value="GURU">Guru</option>
-            </select>
-          </div>
-          <button className="btn btn-primary w-full mt-2" type="submit" disabled={loading}>{loading ? 'Membuat akun...' : 'Daftar'}</button>
+          <button className="btn btn-primary w-full mt-2" type="submit" disabled={loading}>{loading ? 'Membuat akun...' : 'Daftar sebagai Murid'}</button>
           <p className="text-center text-sm text-slate-500 mt-5">Sudah punya akun? <Link className="link" href="/login">Masuk di sini</Link></p>
         </form>
       </section>

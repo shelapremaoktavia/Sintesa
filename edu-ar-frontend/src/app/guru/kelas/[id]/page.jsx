@@ -118,7 +118,7 @@ export default function GuruClassDetail() {
             <div className="form-group"><label className="form-label">Judul Tugas</label><input className="input" value={taskForm.title} onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })} placeholder="Contoh: Foto Praktikum Katrol" required /></div>
             <div className="form-group"><label className="form-label">Deskripsi</label><textarea className="input textarea" value={taskForm.description} onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })} placeholder="Instruksi pengerjaan…" /></div>
             <div className="form-row-2">
-              <div className="form-group"><label className="form-label">Poin XP</label><input type="number" min="10" max="1000" className="input" value={taskForm.points} onChange={(e) => setTaskForm({ ...taskForm, points: e.target.value })} /></div>
+              <div className="form-group"><label className="form-label">Poin XP (s.d. 10.000)</label><input type="number" min="10" max="10000" className="input" value={taskForm.points} onChange={(e) => setTaskForm({ ...taskForm, points: e.target.value })} /></div>
               <div className="form-group"><label className="form-label">Tenggat</label><input type="date" className="input" value={taskForm.dueDate} onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })} /></div>
             </div>
             <AttachmentPicker

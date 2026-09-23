@@ -1,4 +1,5 @@
 
+const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
@@ -6,59 +7,18 @@ const prisma = new PrismaClient();
 const MV = 'https://modelviewer.dev/shared-assets/models';
 const KH = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0';
 
-// Setiap pelajaran dipetakan ke model 3D/AR yang relevan secara tematik.
-// Semua URL memakai CDN bercors-enabled agar <model-viewer> bisa memuatnya.
+// Fokus: Kelas 10 SMK jurusan RPL — setiap misi dipetakan ke model 3D/AR
+// yang relevan secara tematik. URL memakai CDN bercors-enabled agar
+// <model-viewer> bisa memuatnya.
 const CATALOG = [
   {
-    title: 'Sistem Tata Surya',
-    jenjang: 'SD',
-    subjectName: 'IPA',
+    title: 'Sistem Komputer & Cara Kerja',
+    jenjang: 'SMK',
+    subjectName: 'Sistem Komputer',
     description:
-      'Jelajahi planet, orbit, dan skala tata surya dalam 3D. Putar model, zoom, lalu aktifkan mode AR untuk menghadirkan luar angkasa ke meja belajarmu. Misi: identifikasi 3 planet dan raih 100 XP.',
+      'Pahami cara kerja komputer (input–proses–output) lewat model robot 3D: seperti robot menerima perintah, komputer menerima data lewat CPU lalu menghasilkan keluaran. Misi: jelaskan peran CPU & memori, raih 100 XP.',
     asset: {
-      name: 'Model AR — Astronot & Luar Angkasa',
-      glbUrl: `${MV}/Astronaut.glb`,
-      usdzUrl: `${MV}/Astronaut.usdz`,
-      hasAnimation: true,
-      isInteractive: true,
-    },
-  },
-  {
-    title: 'Daur Hidup Kupu-Kupu (Metamorfosis)',
-    jenjang: 'SD',
-    subjectName: 'IPA',
-    description:
-      'Amati tahapan metamorfosis hewan lewat model 3D interaktif. Cocok untuk misi observasi: urutkan fase telur–larva–pupa–dewasa dan kumpulkan badge Langkah Pertama.',
-    asset: {
-      name: 'Model AR — Hewan (Siklus Hidup)',
-      glbUrl: `${KH}/Duck/glTF-Binary/Duck.glb`,
-      usdzUrl: null,
-      hasAnimation: false,
-      isInteractive: true,
-    },
-  },
-  {
-    title: 'Struktur Sel Hewan dan Tumbuhan',
-    jenjang: 'SMP',
-    subjectName: 'Biologi',
-    description:
-      'Bedah struktur sel organik dalam 3D: dinding sel, membran, dan bagian dalamnya. Putar dan perbesar untuk melihat detail yang sulit dipahami dari buku. Misi lab virtual +100 XP.',
-    asset: {
-      name: 'Model AR — Struktur Organik Sel',
-      glbUrl: `${KH}/Avocado/glTF-Binary/Avocado.glb`,
-      usdzUrl: null,
-      hasAnimation: false,
-      isInteractive: true,
-    },
-  },
-  {
-    title: 'Sistem Kerja Katrol',
-    jenjang: 'SMP',
-    subjectName: 'Fisika',
-    description:
-      'Pahami pesawat sederhana dan sistem mekanik lewat model mesin 3D. Eksperimen sudut pandang, analisis bagian bergerak, dan selesaikan tantangan fisika untuk naik level.',
-    asset: {
-      name: 'Model AR — Sistem Mekanik',
+      name: 'Model AR — Sistem Komputer (Robot)',
       glbUrl: `${MV}/RobotExpressive.glb`,
       usdzUrl: null,
       hasAnimation: true,
@@ -66,28 +26,70 @@ const CATALOG = [
     },
   },
   {
-    title: 'Struktur Molekul dan Ikatan Kimia',
-    jenjang: 'SMA',
-    subjectName: 'Kimia',
+    title: 'Jaringan Komputer & Internet',
+    jenjang: 'SMK',
+    subjectName: 'Komputer & Jaringan',
     description:
-      'Visualisasikan molekul H2O dan struktur materi dalam 3D. Putar model untuk memahami ikatan kimia, bentuk molekul, dan skala partikel. Misi kimia +100 XP.',
+      'Pelajari jaringan komputer lewat model satelit 3D: data berpindah antar perangkat via kabel/WiFi, topologi star–bus–ring, dan alamat IP. Misi: sebutkan 3 topologi jaringan, raih 100 XP.',
     asset: {
-      name: 'Model AR — Molekul H2O',
-      glbUrl: `${KH}/WaterBottle/glTF-Binary/WaterBottle.glb`,
+      name: 'Model AR — Satelit Komunikasi Data',
+      glbUrl: `${MV}/Astronaut.glb`,
+      usdzUrl: `${MV}/Astronaut.usdz`,
+      hasAnimation: true,
+      isInteractive: true,
+    },
+  },
+  {
+    title: 'Perangkat Keras: Input–Output',
+    jenjang: 'SMK',
+    subjectName: 'Sistem Komputer',
+    description:
+      'Kenali klasifikasi perangkat keras (input, proses, output, penyimpanan) lewat model speaker 3D sebagai contoh perangkat output. Misi: golongkan 6 perangkat ke tiap kategori, raih 100 XP.',
+    asset: {
+      name: 'Model AR — Perangkat Output (Speaker)',
+      glbUrl: `${KH}/BoomBox/glTF-Binary/BoomBox.glb`,
       usdzUrl: null,
       hasAnimation: false,
       isInteractive: true,
     },
   },
   {
-    title: 'Anatomi Jantung Manusia',
-    jenjang: 'SMA',
-    subjectName: 'Biologi Lanjutan',
+    title: 'Elektronika & Mikrokontroler',
+    jenjang: 'SMK',
+    subjectName: 'Informatika',
     description:
-      'Eksplorasi anatomi tubuh manusia dalam 3D/AR. Perbesar, putar, dan pelajari sistem organ dari berbagai sisi seperti praktikum virtual. Selesaikan dan klaim badge Master Materi.',
+      'Dasar rangkaian listrik, sensor–aktuator, dan mikrokontroler (Arduino) untuk IoT lewat model lampu 3D. Misi: jelaskan alur sensor–proses–aktuator, raih 100 XP.',
     asset: {
-      name: 'Model AR — Anatomi Manusia',
-      glbUrl: `${KH}/BrainStem/glTF-Binary/BrainStem.glb`,
+      name: 'Model AR — Rangkaian Lampu (IoT)',
+      glbUrl: `${KH}/Lantern/glTF-Binary/Lantern.glb`,
+      usdzUrl: null,
+      hasAnimation: false,
+      isInteractive: true,
+    },
+  },
+  {
+    title: 'Algoritma, Flowchart & Pemrograman Dasar',
+    jenjang: 'SMK',
+    subjectName: 'Informatika',
+    description:
+      'Latih berpikir komputasional: algoritma sebagai urutan langkah (seperti langkah berurutan), simbol flowchart, variabel, dan percabangan. Misi: susun algoritma & baca flowchart, raih 100 XP.',
+    asset: {
+      name: 'Model AR — Langkah Algoritma',
+      glbUrl: `${KH}/Duck/glTF-Binary/Duck.glb`,
+      usdzUrl: null,
+      hasAnimation: false,
+      isInteractive: true,
+    },
+  },
+  {
+    title: 'Keamanan Data & Proteksi',
+    jenjang: 'SMK',
+    subjectName: 'Informatika',
+    description:
+      'Lindungi datamu seperti helm melindungi kepala: password kuat, waspada phishing & malware, dan rutin backup. Misi: sebutkan 3 praktik keamanan data, raih 100 XP.',
+    asset: {
+      name: 'Model AR — Proteksi Data (Helm)',
+      glbUrl: `${KH}/DamagedHelmet/glTF-Binary/DamagedHelmet.glb`,
       usdzUrl: null,
       hasAnimation: false,
       isInteractive: true,
@@ -99,6 +101,27 @@ async function ensureSubject(name, jenjang) {
   const existing = await prisma.subject.findFirst({ where: { name, jenjang } });
   if (existing) return existing;
   return prisma.subject.create({ data: { name, jenjang } });
+}
+
+async function ensureAdmin() {
+  const email = process.env.ADMIN_EMAIL || 'admin@sintesa.id';
+  const password = process.env.ADMIN_PASSWORD || 'Admin12345';
+  const usedDefault = !process.env.ADMIN_PASSWORD;
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    console.log(`ℹ️  Admin sudah ada (${email}), dilewati.`);
+    return;
+  }
+
+  const hashed = await bcrypt.hash(password, 10);
+  await prisma.user.create({
+    data: { name: 'Administrator', email, password: hashed, role: 'ADMIN' },
+  });
+  console.log(`✅ Admin dibuat (${email}).`);
+  if (usedDefault) {
+    console.log('⚠️  Memakai password default "Admin12345" — segera ganti lewat database / buat admin baru!');
+  }
 }
 
 async function main() {
@@ -148,7 +171,9 @@ async function main() {
     }
   }
 
-  console.log('✅ Seed selesai! 6 materi + model AR per pelajaran berhasil disiapkan.');
+  await ensureAdmin();
+
+  console.log('✅ Seed selesai! 6 materi RPL Kelas 10 + model AR + akun admin disiapkan.');
 }
 
 main()

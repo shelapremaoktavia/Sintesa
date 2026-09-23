@@ -11,10 +11,11 @@ function publicUser(user) {
   return { id: user.id, name: user.name, email: user.email, role: user.role, avatarUrl: user.avatarUrl || null };
 }
 
-// POST /api/auth/register
+// POST /api/auth/register — pendaftaran publik KHUSUS murid (SISWA).
+// Akun guru hanya bisa dibuat oleh admin lewat /api/admin/teachers.
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Nama, email, dan password wajib diisi' });
@@ -32,7 +33,7 @@ exports.register = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        role: role === 'GURU' ? 'GURU' : 'SISWA',
+        role: 'SISWA',
       },
     });
 

@@ -6,9 +6,9 @@ import { SectionHeading } from '../ui/badges';
 import { fetchLeaderboard } from '../../lib/gamification';
 
 const DEMO_BOARD = [
-  { name: 'Bintang Kelas', xp: 1250, level: 6, title: 'Master AR' },
-  { name: 'Penjelajah Hebat', xp: 860, level: 5, title: 'Penjelajah Elite' },
-  { name: 'Pemburu XP', xp: 540, level: 4, title: 'Penjelajah Mahir' },
+  { name: 'Bintang Kelas', xp: 2450, level: 3, title: 'Master Sintesa' },
+  { name: 'Penjelajah Hebat', xp: 980, level: 2, title: 'Penjelajah Aktif' },
+  { name: 'Pemburu XP', xp: 620, level: 2, title: 'Penjelajah Aktif' },
 ];
 
 const MEDALS = ['🥇', '🥈', '🥉'];

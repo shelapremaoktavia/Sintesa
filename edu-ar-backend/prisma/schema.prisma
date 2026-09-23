@@ -17,6 +17,7 @@ enum Jenjang {
   SD
   SMP
   SMA
+  SMK
 }
 
 model User {

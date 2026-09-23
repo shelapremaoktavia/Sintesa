@@ -30,7 +30,7 @@ export default function CTAFooter({ user }) {
         <div className="landing-container footer-grid">
           <div>
             <div className="brand"><span className="brand-mark">✦</span><span>Sin<span>tesa</span></span></div>
-            <p>Platform pembelajaran gamifikasi berbasis 3D & Augmented Reality untuk SD, SMP, dan SMA.</p>
+            <p>Platform pembelajaran gamifikasi berbasis 3D & Augmented Reality untuk Kelas 10 SMK jurusan RPL.</p>
           </div>
           <div>
             <strong>Platform</strong>
@@ -48,9 +48,9 @@ export default function CTAFooter({ user }) {
           </div>
           <div>
             <strong>Misi AR Populer</strong>
-            <span>🪐 Tata Surya · SD</span>
-            <span>🔬 Struktur Sel · SMP</span>
-            <span>🫀 Anatomi Jantung · SMA</span>
+            <span>🤖 Sistem Komputer</span>
+            <span>🛰️ Jaringan Komputer</span>
+            <span>🪖 Keamanan Data</span>
           </div>
         </div>
         <div className="landing-container footer-bottom">

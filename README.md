@@ -2,23 +2,30 @@
 
 Project final ini mempertahankan struktur dua folder: `edu-ar-frontend` dan `edu-ar-backend`.
 
+## Fokus: Kelas 10 SMK jurusan RPL
+Seluruh AR & pembelajaran difokuskan ke 1 kelas: **Kelas 10 RPL** (mapel Sistem Komputer,
+Komputer & Jaringan, Informatika). 6 misi AR: sistem komputer, jaringan, hardware,
+mikrokontroler, algoritma & keamanan data — tiap misi ada materi + soal latihan.
+
 ## Fitur yang sudah dirapikan
 - HOME profesional bertema gamifikasi + AR (hero + preview 3D interaktif)
-- Katalog AR per pelajaran: 6 model tematik SD–SMA (tata surya, metamorfosis, sel, katrol, molekul, anatomi)
+- Katalog AR RPL: 6 misi Kelas 10 (sistem komputer, jaringan, hardware, mikrokontroler, algoritma, keamanan data)
 - Komponen AR tangguh (`ViewerAR`): loading, fallback model, tombol AR khusus perangkat mendukung
-- Sistem gamifikasi stabil: materi +100, dilihat +10, TUGAS = poin guru (sekali per tugas), arsip 0 XP; 6 level, 6 badge, leaderboard live
+- Level 1–3 saja (Lv.3 Master Sintesa = MAX, tanpa batas XP); poin tugas guru bisa s.d. 10.000
+- Sistem gamifikasi stabil: materi +100, dilihat +10, TUGAS = poin guru (sekali per tugas), arsip 0 XP; 6 badge, leaderboard live
 - Halaman TUGAS (/tugas) terpisah: siswa kumpulkan per tugas guru, guru nilai + feedback per file
 - Pengumpulan guru tampil terpisah: tiap file siswa jadi kartu sendiri (nama, tanggal, nilai, feedback)
 - Tugas bisa dilampiri file penjelas guru (PDF, video, gambar, Word, PPT, maks 15 MB)
+- Preview file terkumpul (gambar & PDF inline) di kartu tugas siswa & guru
 - Halaman LIBRARY (/library) khusus arsip mandiri tanpa XP: gambar, PDF, Word, PPT, Excel, TXT, CSV, ZIP, MP4/MP3
 - Halaman MISI AR (/ar) sendiri: 6 misi + materi & soal latihan per misi + Kelasku (gabung kelas & materi guru)
-- Drawer hamburger kiri: profil + foto + XP/level siswa di atas, menu Dashboard/Tugas/Library/Misi AR
+- Drawer hamburger kiri: kartu profil (foto, nama, peran, XP/level murid · jumlah kelas guru) + menu + Kelas/Tugas minimize
 - Animasi selebrasi: layar sukses "Horey!" + centang memantul saat tugas terkirim & misi selesai, dan koin badge raksasa ala lempar-koin + kilau + konfeti saat badge baru didapat
 - Daftar Kelas Saya & Tugas Saya di drawer: otomatis minimize (tampilkan 1 + tombol sisanya) bila lebih dari 1
 - Foto profil: unggah gambar (PNG/JPG/WEBP/GIF, maks 2 MB) via tombol 📷 di drawer
 - Preview inline gambar & PDF, unduh file, nilai tugas 0–100 + feedback guru
-- Login & register Guru/Siswa
-- Redirect otomatis sesuai role
+- Pendaftaran publik khusus murid (otomatis SISWA); akun guru hanya dibuat admin di /admin
+- Redirect otomatis sesuai role (murid/guru/admin)
 - Dashboard Siswa khusus gamifikasi (XP, badge, leaderboard); materi & kelas di /ar
 - Dashboard Guru: leaderboard + statistik gamifikasi + kelola kelas & tugas
 - Pembuatan kelas + kode kelas unik (guru), gabung kelas (siswa di /ar)
@@ -28,6 +35,10 @@ Project final ini mempertahankan struktur dua folder: `edu-ar-frontend` dan `edu
 - Validasi backend untuk kepemilikan kelas dan keanggotaan siswa
 - API URL frontend bisa diatur lewat `.env.local`
 - `npm run lint` bersih (0 error) dan `npm run build` lolos
+
+## Akun admin awal
+Dibuat otomatis oleh `npm run seed` bila belum ada (bisa diubah via `ADMIN_EMAIL` / `ADMIN_PASSWORD` di `.env`):
+- Email: `admin@sintesa.id` · Password default: `Admin12345` (segera ganti!)
 
 ## Menjalankan backend
 
@@ -62,22 +73,22 @@ Bila URL backend berbeda, salin `edu-ar-frontend/.env.local.example` menjadi `.e
 
 ## Alur uji project
 
-1. Buka HOME `/` — jelajahi hero gamifikasi, katalog AR, leaderboard, dan info Tugas vs Library.
-2. Daftar sebagai **Guru**, login, lalu buat kelas dari dashboard.
-3. Catat kode kelas + buat 1 tugas dengan poin mis. **150 XP**.
-4. Daftar sebagai **Siswa**, login, buka `/ar` → gabung kelas dengan kode.
-5. Buka materi kelas di `/ar` → **Tandai Selesai** (+100 XP), baca tab Materi, kerjakan tab Soal (latihan).
-6. Buka `/tugas` → pilih tugas guru → unggah file → toast **“+150 XP masuk”**, XP dashboard +150.
-7. Upload file kedua di tugas yang sama → XP tetap (anti-farming, revisi boleh).
-8. Buka `/library` → simpan 1 arsip bebas → 0 XP (murni penyimpanan).
-9. Login sebagai Guru → `/tugas` → beri nilai + feedback.
-10. Cek XP/level/badge + leaderboard di dashboard (khusus gamifikasi).
-11. Buka garis-3 → ganti foto profil via tombol 📷, buka-tutup daftar Kelas/Tugas bila isinya banyak.
+1. Buka HOME `/` — hero RPL, katalog 6 misi AR, leaderboard, info Tugas vs Library.
+2. Login sebagai **admin** (`admin@sintesa.id`) → `/admin` → buat akun guru.
+3. Login sebagai **Guru** → buat kelas (mis. "Kelas 10 RPL") → buat tugas poin **1.000** + lampiran PDF.
+4. Daftar sebagai **Murid** (otomatis SISWA) → login → buka `/ar` → gabung kelas.
+5. Buka misi RPL di `/ar` → tab Materi & Soal, buka materi kelas → **Tandai Selesai** (+100 XP).
+6. Buka `/tugas` → lihat lampiran guru → unggah file → animasi "Horey!" + XP masuk.
+7. Kumpulkan hingga XP ≥ 1500 → cek Lv.3 Master Sintesa (MAX), XP terus bertambah tanpa batas.
+8. Buka `/library` → simpan arsip → 0 XP. Preview file terkumpul via 👁️ di kartu tugas.
+9. Login Guru → `/tugas` → tiap pengumpulan tampil kartu terpisah → beri nilai.
+10. Garis-3: kartu profil (foto, XP/kelas), minimize Kelas/Tugas bila >1.
 
-## Aturan XP (stabil)
+## Aturan XP & level
 
+- Level 1 Penjelajah Baru (0+) · Level 2 Penjelajah Aktif (500+) · **Level 3 Master Sintesa (1500+, MAX, XP tanpa batas)**
 - Materi selesai +100 · dilihat +10
-- Tugas guru: +`assignment.points` SEKALI per tugas (upload revisi tidak nambah)
+- Tugas guru: +`assignment.points` SEKALI per tugas, poin boleh s.d. **10.000**
 - Arsip Library mandiri: +0 XP (tanpa XP)
 - Kuis di /ar: latihan, tanpa XP
 
@@ -85,21 +96,22 @@ Bila URL backend berbeda, salin `edu-ar-frontend/.env.local.example` menjadi `.e
 
 ```text
 edu-ar-frontend/src/
-  app/            → routing (/, /login, /register, /guru, /siswa, /ar, /tugas, /library, /kelas, /siswa/materi)
+  app/            → routing (/, /login, /register, /admin, /guru, /siswa, /ar, /tugas, /library, /kelas, /siswa/materi)
   components/
     home/         → HeroGamifikasi, GamifikasiFeatures, ARShowcase, LeaderboardSection, HowAndLibrary, CTAFooter
     ARViewer/     → ViewerAR (satu komponen 3D/AR untuk semua halaman)
     library/      → LibraryUploader, LibraryExplorer
-    ui/           → AppHeader, badges (XPBadge, SectionHeading)
-  lib/            → api, arCatalog, gamification, library (satu sumber kebenaran)
+    tugas/        → AttachmentPicker, TaskAttachmentBox, FilePreview
+    ui/           → AppHeader, badges (XPBadge, SectionHeading), Celebration
+  lib/            → api, arCatalog (RPL), gamification, library (satu sumber kebenaran)
 
 edu-ar-backend/
   server.js       → entry point + static /uploads + 404 JSON + error handler
-  routes/         → auth, classes, materials, assignments, library, gamification
+  routes/         → auth, classes, materials, assignments, library, gamification, admin
   controllers/    → logika tiap domain + validasi role/kepemilikan
-  middleware/     → authMiddleware (JWT), upload (multer 15 MB library + avatar 2 MB khusus gambar)
-  prisma/         → schema.prisma + seed.js (6 materi AR per pelajaran)
-  uploads/        → penyimpanan file Library + avatars/ foto profil
+  middleware/     → authMiddleware (JWT), upload (multer 15 MB library/tugas + avatar 2 MB khusus gambar)
+  prisma/         → schema.prisma + seed.js (6 materi RPL Kelas 10 + admin awal)
+  uploads/        → penyimpanan file Library + tasks/ lampiran + avatars/ foto profil
 ```
 
 ## Catatan
