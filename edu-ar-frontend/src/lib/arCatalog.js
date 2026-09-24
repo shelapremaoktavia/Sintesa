@@ -1,10 +1,9 @@
 // lib/arCatalog.js
 // Katalog AR: fokus Kelas 10 SMK jurusan RPL — satu sumber kebenaran untuk
 // HOME, halaman /ar, dashboard, dan halaman materi.
-// URL model selaras dengan prisma/seed.js backend.
-// Setiap misi membawa: materi pembelajaran + soal latihan (kuis).
-const MV = 'https://modelviewer.dev/shared-assets/models';
-const KH = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0';
+// Model 3D milik sendiri tersimpan di public/models/ (dikirim bersama aplikasi,
+// tanpa bergantung CDN luar). Setiap misi membawa: materi + soal latihan (kuis).
+const LOCAL = '/models';
 
 export const KELAS_FOKUS = 'Kelas 10 RPL';
 
@@ -15,16 +14,16 @@ export const AR_CATALOG = [
     jenjang: 'SMK',
     kelas: KELAS_FOKUS,
     subject: 'Sistem Komputer',
-    emoji: '🤖',
+    emoji: '🖥️',
     gradient: 'linear-gradient(135deg,#4f46e5,#7c3aed 55%,#db2777)',
-    glb: `${MV}/RobotExpressive.glb`,
+    glb: `${LOCAL}/komputer_desktop.glb`,
     usdz: null,
     mission: 'Jelaskan input–proses–output & raih 100 XP',
     xp: 100,
     skills: ['Sistem Komputer', 'CPU & Memori'],
-    instruction: 'Putar model robot, amati bagian mekaniknya, lalu kaitkan: sensor = input, CPU = proses, gerakan = output.',
+    instruction: 'Putar model komputer desktop, amati unit sistemnya, lalu kaitkan: keyboard = input, CPU = proses, monitor = output.',
     materi: [
-      { judul: 'Komputer = Sistem', isi: 'Komputer adalah sistem yang menerima data (input), mengolahnya lewat CPU dibantu memori, lalu menghasilkan informasi (output). Seperti robot yang menerima perintah lalu bergerak.' },
+      { judul: 'Komputer = Sistem', isi: 'Komputer adalah sistem yang menerima data (input), mengolahnya lewat CPU dibantu memori, lalu menghasilkan informasi (output). Seperti komputer desktop di model ini.' },
       { judul: 'Komponen Utama', isi: 'CPU sebagai otak, RAM sebagai meja kerja sementara, storage (SSD/HDD) sebagai lemari arsip, dan motherboard sebagai papan penghubung semuanya.' },
       { judul: 'Perangkat Lunak', isi: 'Tanpa software, hardware hanyalah besi. Sistem operasi (Windows/Linux) mengatur sumber daya, aplikasi (VS Code, browser) membantu pekerjaan RPL.' },
     ],
@@ -40,14 +39,14 @@ export const AR_CATALOG = [
     jenjang: 'SMK',
     kelas: KELAS_FOKUS,
     subject: 'Komputer & Jaringan',
-    emoji: '🛰️',
+    emoji: '🌐',
     gradient: 'linear-gradient(135deg,#0284c7,#6366f1 55%,#a855f7)',
-    glb: `${MV}/Astronaut.glb`,
-    usdz: `${MV}/Astronaut.usdz`,
+    glb: `${LOCAL}/tik_komputer_kdr.glb`,
+    usdz: null,
     mission: 'Sebutkan 3 topologi jaringan & raih 100 XP',
     xp: 100,
     skills: ['Topologi', 'IP Address'],
-    instruction: 'Arahkan kamera ke meja kosong, ketuk “Lihat dalam AR”, dan bayangkan satelit ini sebagai simpul raksasa jaringan internet.',
+    instruction: 'Arahkan kamera ke meja kosong, ketuk “Lihat dalam AR”, dan amati model perangkat TIK sebagai simpul jaringan.',
     materi: [
       { judul: 'Apa itu Jaringan?', isi: 'Jaringan komputer adalah dua atau lebih perangkat yang saling terhubung untuk berbagi data & sumber daya — via kabel (LAN) atau nirkabel (WiFi) hingga satelit.' },
       { judul: 'Topologi Populer', isi: 'Star (semua ke switch/hub pusat — paling umum di lab RPL), bus (satu jalur backbone), dan ring (melingkar). Star paling mudah dikelola dan diperbaiki.' },
@@ -65,14 +64,14 @@ export const AR_CATALOG = [
     jenjang: 'SMK',
     kelas: KELAS_FOKUS,
     subject: 'Sistem Komputer',
-    emoji: '🔊',
+    emoji: '⌨️',
     gradient: 'linear-gradient(135deg,#059669,#0ea5e9 60%,#6366f1)',
-    glb: `${KH}/BoomBox/glTF-Binary/BoomBox.glb`,
+    glb: `${LOCAL}/perangkat_komputer.glb`,
     usdz: null,
     mission: 'Golongkan 6 perangkat & raih 100 XP',
     xp: 100,
     skills: ['Hardware', 'Klasifikasi'],
-    instruction: 'Putar model speaker — ia contoh perangkat output. Lalu golongkan perangkat di labmu ke input, proses, output, dan penyimpanan.',
+    instruction: 'Putar model perangkat komputer — amati tiap bagiannya, lalu golongkan perangkat di labmu ke input, proses, output, dan penyimpanan.',
     materi: [
       { judul: 'Empat Golongan Hardware', isi: 'Input (keyboard, mouse, scanner), proses (CPU, GPU, motherboard), output (monitor, printer, speaker), dan penyimpanan (SSD, HDD, flashdisk).' },
       { judul: 'Contoh di Lab RPL', isi: 'Mengetik kode di keyboard (input) → dikompilasi CPU (proses) → hasil tampil di monitor (output) → project disimpan di SSD (penyimpanan).' },
@@ -92,12 +91,12 @@ export const AR_CATALOG = [
     subject: 'Informatika',
     emoji: '💡',
     gradient: 'linear-gradient(135deg,#ea580c,#f59e0b 55%,#eab308)',
-    glb: `${KH}/Lantern/glTF-Binary/Lantern.glb`,
+    glb: `${LOCAL}/perangkat_komputer_-_ibnu_hakim.glb`,
     usdz: null,
     mission: 'Jelaskan sensor–proses–aktuator & raih 100 XP',
     xp: 100,
     skills: ['Rangkaian Listrik', 'Arduino & IoT'],
-    instruction: 'Amati model lampu: seperti lampu menyala saat ada arus, aktuator bekerja saat mikrokontroler memberi sinyal.',
+    instruction: 'Amati model modul elektronik: seperti modul yang saling terhubung ini, sistem IoT merangkai sensor, mikrokontroler, dan aktuator.',
     materi: [
       { judul: 'Rangkaian Dasar', isi: 'Arus mengalir dari sumber (baterai) melalui kabel ke beban (lampu) dan kembali. Saklar memutus/menyambung aliran — konsep yang sama dipakai di semua elektronika.' },
       { judul: 'Sensor – Proses – Aktuator', isi: 'Sensor membaca dunia (suhu, cahaya, jarak) → mikrokontroler (Arduino) memproses → aktuator bertindak (LED menyala, motor berputar, buzzer berbunyi).' },
@@ -115,14 +114,14 @@ export const AR_CATALOG = [
     jenjang: 'SMK',
     kelas: KELAS_FOKUS,
     subject: 'Informatika',
-    emoji: '🦆',
+    emoji: '💻',
     gradient: 'linear-gradient(135deg,#0d9488,#22c55e 55%,#84cc16)',
-    glb: `${KH}/Duck/glTF-Binary/Duck.glb`,
+    glb: `${LOCAL}/computer.glb`,
     usdz: null,
     mission: 'Susun algoritma & baca flowchart, raih 100 XP',
     xp: 100,
     skills: ['Berpikir Komputasional', 'Flowchart'],
-    instruction: 'Seperti langkah berurutan yang tidak boleh dilompat, algoritma adalah urutan langkah pasti untuk menyelesaikan masalah.',
+    instruction: 'Program yang kamu tulis dijalankan komputer ini: algoritma sebagai urutan langkah pasti, divisualkan lewat flowchart sebelum dikode.',
     materi: [
       { judul: 'Algoritma = Resep', isi: 'Algoritma adalah urutan langkah logis dan pasti: mis. resep mie instan atau langkah login (input username → cek password → tampilkan dashboard).' },
       { judul: 'Simbol Flowchart', isi: 'Oval = mulai/selesai, persegi = proses, belah ketupat = keputusan/percabangan (ya/tidak), jajar genjang = input/output.' },
@@ -140,14 +139,14 @@ export const AR_CATALOG = [
     jenjang: 'SMK',
     kelas: KELAS_FOKUS,
     subject: 'Informatika',
-    emoji: '🪖',
+    emoji: '📷',
     gradient: 'linear-gradient(135deg,#e11d48,#f43f5e 55%,#fb7185)',
-    glb: `${KH}/DamagedHelmet/glTF-Binary/DamagedHelmet.glb`,
+    glb: `${LOCAL}/computer_props_camera_base.glb`,
     usdz: null,
     mission: 'Sebutkan 3 praktik keamanan & raih 100 XP',
     xp: 100,
     skills: ['Password Aman', 'Anti Phishing'],
-    instruction: 'Seperti helm melindungi kepala, proteksi berlapis melindungi datamu: password, verifikasi, dan backup.',
+    instruction: 'Seperti kamera pengawas yang menjaga ruangan, proteksi berlapis menjaga datamu: password, verifikasi, dan backup.',
     materi: [
       { judul: 'Password yang Kuat', isi: 'Minimal 8 karakter campuran huruf besar–kecil, angka, dan simbol. Jangan pakai tanggal lahir/NIS, bedakan password tiap akun, aktifkan verifikasi 2 langkah.' },
       { judul: 'Ancaman Umum', isi: 'Phishing (link palsu pencuri akun), malware/virus dari file bajakan, dan wifi publik tanpa VPN. Cek alamat link sebelum klik dan login.' },

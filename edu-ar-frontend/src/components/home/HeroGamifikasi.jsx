@@ -52,7 +52,7 @@ export default function HeroGamifikasi({ user }) {
 
         <div className="hero-ar-panel">
           <div className="hero-ar-head">
-            <span className="live-dot" /> LIVE PREVIEW · MODEL AR ROBOT
+            <span className="live-dot" /> LIVE PREVIEW · MODEL AR KOMPUTER
             <span className="xp-float">+100 XP</span>
           </div>
           <div className="hero-ar-view">
@@ -60,7 +60,7 @@ export default function HeroGamifikasi({ user }) {
           </div>
           <div className="hero-ar-foot">
             <div className="hero-mission">
-              <span className="mission-emoji">🤖</span>
+              <span className="mission-emoji">🖥️</span>
               <div>
                 <strong>Misi: Sistem Komputer</strong>
                 <p>Putar model · Zoom · Ketuk “Lihat dalam AR”</p>

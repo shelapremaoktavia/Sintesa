@@ -4,8 +4,9 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-const MV = 'https://modelviewer.dev/shared-assets/models';
-const KH = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0';
+// Model 3D milik sendiri (folder edu-ar-frontend/public/models/).
+// URL relatif satu origin dengan frontend sehingga bebas masalah CORS.
+const LOCAL = '/models';
 
 // Fokus: Kelas 10 SMK jurusan RPL — setiap misi dipetakan ke model 3D/AR
 // yang relevan secara tematik. URL memakai CDN bercors-enabled agar
@@ -16,12 +17,12 @@ const CATALOG = [
     jenjang: 'SMK',
     subjectName: 'Sistem Komputer',
     description:
-      'Pahami cara kerja komputer (input–proses–output) lewat model robot 3D: seperti robot menerima perintah, komputer menerima data lewat CPU lalu menghasilkan keluaran. Misi: jelaskan peran CPU & memori, raih 100 XP.',
+      'Pahami cara kerja komputer (input–proses–output) lewat model komputer desktop 3D: seperti PC menerima data lewat CPU lalu menghasilkan keluaran. Misi: jelaskan peran CPU & memori, raih 100 XP.',
     asset: {
-      name: 'Model AR — Sistem Komputer (Robot)',
-      glbUrl: `${MV}/RobotExpressive.glb`,
+      name: 'Model AR — Komputer Desktop (Sistem Komputer)',
+      glbUrl: `${LOCAL}/komputer_desktop.glb`,
       usdzUrl: null,
-      hasAnimation: true,
+      hasAnimation: false,
       isInteractive: true,
     },
   },
@@ -30,12 +31,12 @@ const CATALOG = [
     jenjang: 'SMK',
     subjectName: 'Komputer & Jaringan',
     description:
-      'Pelajari jaringan komputer lewat model satelit 3D: data berpindah antar perangkat via kabel/WiFi, topologi star–bus–ring, dan alamat IP. Misi: sebutkan 3 topologi jaringan, raih 100 XP.',
+      'Pelajari jaringan komputer lewat model perangkat TIK 3D: data berpindah antar perangkat via kabel/WiFi, topologi star–bus–ring, dan alamat IP. Misi: sebutkan 3 topologi jaringan, raih 100 XP.',
     asset: {
-      name: 'Model AR — Satelit Komunikasi Data',
-      glbUrl: `${MV}/Astronaut.glb`,
-      usdzUrl: `${MV}/Astronaut.usdz`,
-      hasAnimation: true,
+      name: 'Model AR — Perangkat TIK (Jaringan)',
+      glbUrl: `${LOCAL}/tik_komputer_kdr.glb`,
+      usdzUrl: null,
+      hasAnimation: false,
       isInteractive: true,
     },
   },
@@ -44,10 +45,10 @@ const CATALOG = [
     jenjang: 'SMK',
     subjectName: 'Sistem Komputer',
     description:
-      'Kenali klasifikasi perangkat keras (input, proses, output, penyimpanan) lewat model speaker 3D sebagai contoh perangkat output. Misi: golongkan 6 perangkat ke tiap kategori, raih 100 XP.',
+      'Kenali klasifikasi perangkat keras (input, proses, output, penyimpanan) lewat model perangkat komputer 3D. Misi: golongkan 6 perangkat ke tiap kategori, raih 100 XP.',
     asset: {
-      name: 'Model AR — Perangkat Output (Speaker)',
-      glbUrl: `${KH}/BoomBox/glTF-Binary/BoomBox.glb`,
+      name: 'Model AR — Perangkat Komputer (Hardware)',
+      glbUrl: `${LOCAL}/perangkat_komputer.glb`,
       usdzUrl: null,
       hasAnimation: false,
       isInteractive: true,
@@ -58,10 +59,10 @@ const CATALOG = [
     jenjang: 'SMK',
     subjectName: 'Informatika',
     description:
-      'Dasar rangkaian listrik, sensor–aktuator, dan mikrokontroler (Arduino) untuk IoT lewat model lampu 3D. Misi: jelaskan alur sensor–proses–aktuator, raih 100 XP.',
+      'Dasar rangkaian listrik, sensor–aktuator, dan mikrokontroler (Arduino) untuk IoT lewat model modul elektronik 3D. Misi: jelaskan alur sensor–proses–aktuator, raih 100 XP.',
     asset: {
-      name: 'Model AR — Rangkaian Lampu (IoT)',
-      glbUrl: `${KH}/Lantern/glTF-Binary/Lantern.glb`,
+      name: 'Model AR — Modul Elektronik (IoT)',
+      glbUrl: `${LOCAL}/perangkat_komputer_-_ibnu_hakim.glb`,
       usdzUrl: null,
       hasAnimation: false,
       isInteractive: true,
@@ -74,8 +75,8 @@ const CATALOG = [
     description:
       'Latih berpikir komputasional: algoritma sebagai urutan langkah (seperti langkah berurutan), simbol flowchart, variabel, dan percabangan. Misi: susun algoritma & baca flowchart, raih 100 XP.',
     asset: {
-      name: 'Model AR — Langkah Algoritma',
-      glbUrl: `${KH}/Duck/glTF-Binary/Duck.glb`,
+      name: 'Model AR — Komputer Programmer (Algoritma)',
+      glbUrl: `${LOCAL}/computer.glb`,
       usdzUrl: null,
       hasAnimation: false,
       isInteractive: true,
@@ -86,10 +87,10 @@ const CATALOG = [
     jenjang: 'SMK',
     subjectName: 'Informatika',
     description:
-      'Lindungi datamu seperti helm melindungi kepala: password kuat, waspada phishing & malware, dan rutin backup. Misi: sebutkan 3 praktik keamanan data, raih 100 XP.',
+      'Lindungi datamu seperti kamera pengawas menjaga ruangan: password kuat, waspada phishing & malware, dan rutin backup. Misi: sebutkan 3 praktik keamanan data, raih 100 XP.',
     asset: {
-      name: 'Model AR — Proteksi Data (Helm)',
-      glbUrl: `${KH}/DamagedHelmet/glTF-Binary/DamagedHelmet.glb`,
+      name: 'Model AR — Kamera Pengawas (Keamanan Data)',
+      glbUrl: `${LOCAL}/computer_props_camera_base.glb`,
       usdzUrl: null,
       hasAnimation: false,
       isInteractive: true,

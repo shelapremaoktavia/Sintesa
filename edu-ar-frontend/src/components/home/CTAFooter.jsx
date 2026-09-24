@@ -48,9 +48,9 @@ export default function CTAFooter({ user }) {
           </div>
           <div>
             <strong>Misi AR Populer</strong>
-            <span>🤖 Sistem Komputer</span>
-            <span>🛰️ Jaringan Komputer</span>
-            <span>🪖 Keamanan Data</span>
+            <span>🖥️ Sistem Komputer</span>
+            <span>🌐 Jaringan Komputer</span>
+            <span>📷 Keamanan Data</span>
           </div>
         </div>
         <div className="landing-container footer-bottom">
