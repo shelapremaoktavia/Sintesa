@@ -266,14 +266,14 @@ Saat badge baru didapat → muncul animasi **koin raksasa dilempar + kilau + kon
 
 ## 9. Misi AR Kelas 10 RPL
 
-| # | Misi | Mapel | Model 3D |
+| # | Misi | Mapel | Model 3D (milik sendiri) |
 |---|---|---|---|
-| 1 | 🤖 Sistem Komputer & Cara Kerja | Sistem Komputer | Robot |
-| 2 | 🛰️ Jaringan Komputer & Internet | Komputer & Jaringan | Astronot/Satelit |
-| 3 | 🔊 Perangkat Keras: Input–Output | Sistem Komputer | Speaker |
-| 4 | 💡 Elektronika & Mikrokontroler | Informatika | Lampu IoT |
-| 5 | 🦆 Algoritma, Flowchart & Pemrograman Dasar | Informatika | Bebek langkah |
-| 6 | 🪖 Keamanan Data & Proteksi | Informatika | Helm |
+| 1 | 🖥️ Sistem Komputer & Cara Kerja | Sistem Komputer | Komputer desktop |
+| 2 | 🌐 Jaringan Komputer & Internet | Komputer & Jaringan | Perangkat TIK |
+| 3 | ⌨️ Perangkat Keras: Input–Output | Sistem Komputer | Perangkat komputer |
+| 4 | 💡 Elektronika & Mikrokontroler | Informatika | Modul elektronik |
+| 5 | 💻 Algoritma, Flowchart & Pemrograman Dasar | Informatika | Komputer programmer |
+| 6 | 📷 Keamanan Data & Proteksi | Informatika | Kamera pengawas |
 
 Setiap misi = **1 model 3D/AR + 3 artikel materi + 3 soal pilihan ganda berpembahasan**.
 
