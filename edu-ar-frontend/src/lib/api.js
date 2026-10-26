@@ -1,6 +1,6 @@
 import { upload } from '@vercel/blob/client';
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL_VERCEL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 export const LEGACY_UPLOADS_ORIGIN = (
   process.env.NEXT_PUBLIC_LEGACY_UPLOADS_URL || API_URL.replace(/\/api$/, '')
 ).replace(/\/+$/, '');
