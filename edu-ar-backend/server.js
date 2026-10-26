@@ -13,12 +13,15 @@ const adminRoutes = require('./routes/adminRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
-const allowedOrigins = new Set(
-  (process.env.CORS_ORIGINS || 'http://localhost:3000')
+const normalizeOrigin = (origin) => origin.trim().replace(/\/+$/, '');
+const allowedOrigins = new Set([
+  ...(process.env.CORS_ORIGINS || 'http://localhost:3000')
     .split(',')
-    .map((origin) => origin.trim())
+    .map(normalizeOrigin)
     .filter(Boolean),
-);
+  // Keep the production frontend explicit; do not allow arbitrary *.vercel.app origins.
+  'https://sintesa-chi.vercel.app',
+]);
 
 if (!process.env.JWT_SECRET) {
   const message = 'JWT_SECRET wajib diatur sebelum auth dapat digunakan.';
@@ -29,7 +32,7 @@ if (!process.env.JWT_SECRET) {
 app.set('trust proxy', 1);
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.has(origin)) return callback(null, true);
+    if (!origin || allowedOrigins.has(normalizeOrigin(origin))) return callback(null, true);
     return callback(new Error('Origin tidak diizinkan oleh CORS'));
   },
 }));
