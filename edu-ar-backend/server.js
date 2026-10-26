@@ -13,6 +13,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
+const { protect, allowRoles } = require('./middleware/authMiddleware');
 const normalizeOrigin = (origin) => origin.trim().replace(/\/+$/, '');
 const allowedOrigins = new Set([
   ...(process.env.CORS_ORIGINS || 'http://localhost:3000')
@@ -51,7 +52,7 @@ app.use('/api/gamification', gamificationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/uploads', uploadRoutes);
 
-app.get('/test-db', async (req, res) => {
+app.get('/test-db', protect, allowRoles('ADMIN'), async (req, res) => {
   try {
     const subjects = await prisma.subject.findMany();
     res.json({
