@@ -7,10 +7,9 @@ const {
   deleteSubmission,
   gradeSubmission,
 } = require('../controllers/libraryController');
-const { upload } = require('../middleware/upload');
 const { protect, allowRoles } = require('../middleware/authMiddleware');
 
-router.post('/upload', protect, allowRoles('SISWA'), upload.single('file'), uploadSubmission);
+router.post('/upload', protect, allowRoles('SISWA'), uploadSubmission);
 router.get('/', protect, getLibrary);
 router.get('/stats', protect, getLibraryStats);
 router.delete('/:id', protect, deleteSubmission);

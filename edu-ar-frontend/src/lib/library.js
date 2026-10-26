@@ -4,7 +4,7 @@
 //    XP = poin tugas (assignment.points), dihitung sekali per tugas.
 // 2) LIBRARY (/library): arsip mandiri tanpa assignmentId (gambar, PDF, Word, dsb).
 //    XP = +50 per file, tidak dinilai guru.
-import { API_URL, apiFetch } from './api';
+import { API_URL, LEGACY_UPLOADS_ORIGIN, apiFetch, uploadFileToBlob } from './api';
 
 export const BACKEND_ORIGIN = API_URL.replace(/\/api$/, '');
 
@@ -71,7 +71,7 @@ export function formatDate(value) {
 export function fileAbsoluteUrl(item = {}) {
   if (!item.fileUrl) return '#';
   if (item.fileUrl.startsWith('http')) return item.fileUrl;
-  return `${BACKEND_ORIGIN}${item.fileUrl}`;
+  return LEGACY_UPLOADS_ORIGIN + item.fileUrl;
 }
 
 export function canPreviewInline(item = {}) {
@@ -112,20 +112,17 @@ export function xpPreviewForAssignment(assignment) {
 }
 
 export async function uploadLibraryFile({ file, assignmentId, classId, materialId, description }) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const form = new FormData();
-  form.append('file', file);
-  if (assignmentId) form.append('assignmentId', assignmentId);
-  if (classId) form.append('classId', classId);
-  if (materialId) form.append('materialId', materialId);
-  if (description) form.append('description', description);
-
-  const response = await fetch(`${API_URL}/library/upload`, {
+  const uploadedFile = await uploadFileToBlob(file, 'submission');
+  const { response, data } = await apiFetch('/library/upload', {
     method: 'POST',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: form,
+    body: JSON.stringify({
+      file: uploadedFile,
+      assignmentId,
+      classId,
+      materialId,
+      description,
+    }),
   });
-  const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.message || 'Gagal mengunggah file.');
   return data;
 }
@@ -178,27 +175,13 @@ export async function fetchClassAssignments(classId) {
 }
 
 export async function createAssignment(payload, attachmentFile) {
-  // Guru boleh melampirkan 1 file penjelas (PDF, video, gambar, dsb).
-  // Jika ada file → kirim multipart; jika tidak → JSON seperti biasa.
-  if (attachmentFile) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const form = new FormData();
-    Object.entries(payload || {}).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') form.append(key, String(value));
-    });
-    form.append('attachment', attachmentFile);
-    const response = await fetch(`${API_URL}/assignments`, {
-      method: 'POST',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      body: form,
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.message || 'Gagal membuat tugas.');
-    return data;
-  }
+  // File lampiran dikirim langsung ke Blob sebelum metadata tugas disimpan.
+  const attachment = attachmentFile
+    ? await uploadFileToBlob(attachmentFile, 'assignment')
+    : null;
   const { response, data } = await apiFetch('/assignments', {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ ...(payload || {}), ...(attachment ? { attachment } : {}) }),
   });
   if (!response.ok) throw new Error(data.message || 'Gagal membuat tugas.');
   return data;
@@ -209,7 +192,7 @@ export function taskAttachmentUrl(task = {}) {
   const u = task.attachFileUrl;
   if (!u) return null;
   if (u.startsWith('http')) return u;
-  return `${BACKEND_ORIGIN}${u}`;
+  return LEGACY_UPLOADS_ORIGIN + u;
 }
 
 /** Ikon emoji berdasarkan tipe lampiran tugas. */

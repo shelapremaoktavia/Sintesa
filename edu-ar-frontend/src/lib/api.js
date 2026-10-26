@@ -1,4 +1,9 @@
+import { upload } from '@vercel/blob/client';
+
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+export const LEGACY_UPLOADS_ORIGIN = (
+  process.env.NEXT_PUBLIC_LEGACY_UPLOADS_URL || API_URL.replace(/\/api$/, '')
+).replace(/\/+$/, '');
 
 export async function apiFetch(path, options = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -28,12 +33,45 @@ export function getSavedUser() {
   }
 }
 
-/** URL absolut foto profil (backend menyimpan path relatif /uploads/avatars/...). */
+/** Upload browser langsung ke Blob; server hanya membuat token terbatas dan memeriksa metadata. */
+export async function uploadFileToBlob(file, scope) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const user = getSavedUser();
+  if (!token || !user?.id) throw new Error('Silakan login ulang sebelum mengunggah file.');
+
+  const isAvatar = scope === 'avatar';
+  const maximumSize = isAvatar ? 2 * 1024 * 1024 : 15 * 1024 * 1024;
+  if (!file || file.size < 1 || file.size > maximumSize) {
+    throw new Error(isAvatar ? 'Ukuran foto maksimal 2 MB.' : 'Ukuran file maksimal 15 MB.');
+  }
+
+  const safeName = String(file.name || 'file')
+    .replace(/[^a-zA-Z0-9._-]/g, '_')
+    .slice(-120) || 'file';
+  const pathname = 'users/' + user.id + '/' + scope + '/' + Date.now() + '-' + safeName;
+  const blob = await upload(pathname, file, {
+    access: 'public',
+    handleUploadUrl: API_URL + '/uploads/client',
+    headers: { Authorization: 'Bearer ' + token },
+    clientPayload: scope,
+    multipart: file.size > 4.5 * 1024 * 1024,
+  });
+
+  return {
+    url: blob.url,
+    pathname: blob.pathname,
+    originalName: file.name || safeName,
+    contentType: blob.contentType || file.type || 'application/octet-stream',
+    size: file.size,
+  };
+}
+
+/** URL absolut untuk foto baru (Blob) atau file lama dari backend sebelumnya. */
 export function avatarUrlOf(user) {
   const u = user?.avatarUrl;
   if (!u) return null;
   if (u.startsWith('http')) return u;
-  return `${API_URL.replace(/\/api$/, '')}${u}`;
+  return LEGACY_UPLOADS_ORIGIN + u;
 }
 
 /** Ubah profil sendiri (nama dan/atau password). */
@@ -62,15 +100,11 @@ export async function joinClass(code) {
 
 /** Unggah foto profil baru (gambar, maks 2 MB). Mengembalikan { message, user }. */
 export async function uploadAvatar(file) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const form = new FormData();
-  form.append('avatar', file);
-  const response = await fetch(`${API_URL}/auth/avatar`, {
+  const uploadedFile = await uploadFileToBlob(file, 'avatar');
+  const { response, data } = await apiFetch('/auth/avatar', {
     method: 'POST',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: form,
+    body: JSON.stringify({ file: uploadedFile }),
   });
-  const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.message || 'Gagal mengunggah foto profil.');
   if (data.user && typeof window !== 'undefined') {
     localStorage.setItem('user', JSON.stringify(data.user));

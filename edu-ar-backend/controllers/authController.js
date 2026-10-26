@@ -1,10 +1,8 @@
 // controllers/authController.js
 const bcrypt = require('bcryptjs');
-const fs = require('fs');
-const path = require('path');
 const jwt = require('jsonwebtoken');
 const prisma = require('../config/db');
-const { AVATAR_DIR } = require('../middleware/upload');
+const { verifyOwnedBlob, deleteBlobIfVercelUrl } = require('../services/blobStorage');
 
 function publicUser(user) {
   if (!user) return user;
@@ -131,32 +129,28 @@ exports.updateMe = async (req, res) => {
   }
 };
 
-// POST /api/auth/avatar — unggah foto profil (multipart: avatar, maks 2 MB)
+// POST /api/auth/avatar — simpan metadata foto yang sudah diunggah ke Blob.
 exports.uploadAvatar = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: 'File foto wajib diunggah' });
+    if (!req.body?.file) return res.status(400).json({ message: 'File foto wajib diunggah' });
 
     const current = await prisma.user.findUnique({ where: { id: req.user.userId } });
-    if (!current) {
-      fs.unlink(path.join(AVATAR_DIR, req.file.filename), () => {});
-      return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
-    }
+    if (!current) return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
 
-    // Hapus foto lama agar folder avatars tidak menumpuk
-    if (current.avatarUrl) {
-      const oldName = current.avatarUrl.split('/').pop();
-      if (oldName && oldName !== req.file.filename) {
-        fs.unlink(path.join(AVATAR_DIR, oldName), () => {});
-      }
-    }
-
+    const blob = await verifyOwnedBlob(req.body.file, {
+      userId: req.user.userId,
+      scope: 'avatar',
+    });
     const updated = await prisma.user.update({
       where: { id: req.user.userId },
-      data: { avatarUrl: `/uploads/avatars/${req.file.filename}` },
+      data: { avatarUrl: blob.url },
     });
 
+    if (current.avatarUrl && current.avatarUrl !== blob.url) {
+      await deleteBlobIfVercelUrl(current.avatarUrl);
+    }
     res.json({ message: 'Foto profil diperbarui', user: publicUser(updated) });
   } catch (error) {
-    res.status(500).json({ message: 'Gagal mengunggah foto profil', error: error.message });
+    res.status(error.status || 500).json({ message: 'Gagal mengunggah foto profil', error: error.message });
   }
 };

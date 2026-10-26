@@ -42,9 +42,8 @@ mikrokontroler, algoritma & keamanan data — tiap misi ada materi + soal latiha
 - API URL frontend bisa diatur lewat `.env.local`
 - `npm run lint` bersih (0 error) dan `npm run build` lolos
 
-## Akun admin awal
-Dibuat otomatis oleh `npm run seed` bila belum ada (bisa diubah via `ADMIN_EMAIL` / `ADMIN_PASSWORD` di `.env`):
-- Email: `admin@sintesa.id` · Password default: `Admin12345` (segera ganti!)
+## Admin pertama
+Akun admin pertama dibuat saat seeding hanya jika ADMIN_EMAIL dan ADMIN_PASSWORD diisi. Repo ini tidak lagi menyediakan kredensial bawaan; gunakan password unik yang kuat.
 
 ## Menjalankan backend
 
@@ -62,7 +61,15 @@ Buat file `.env` dari `.env.example`, lalu isi:
 DATABASE_URL="postgresql://USER:PASSWORD@HOST/DATABASE?sslmode=require"
 JWT_SECRET="ganti-dengan-secret-yang-aman"
 PORT=5000
+CORS_ORIGINS="http://localhost:3000,https://alamat-frontend.vercel.app"
+BLOB_READ_WRITE_TOKEN="REDACTED"
+ADMIN_EMAIL="admin@contoh.id"
+ADMIN_PASSWORD="REDACTED"
 ```
+
+File dan foto diunggah langsung dari browser ke Vercel Blob. Hubungkan Blob store ke backend sebelum upload digunakan. Untuk database lokal/cloud, jalankan migrasi secara terpisah dengan `npm run migrate:deploy`.
+
+Panduan konfigurasi dua project Vercel dan migrasi dari Railway ada di [VERCEL_DEPLOY.md](VERCEL_DEPLOY.md).
 
 ## Menjalankan frontend
 
@@ -80,7 +87,7 @@ Bila URL backend berbeda, salin `edu-ar-frontend/.env.local.example` menjadi `.e
 ## Alur uji project
 
 1. Buka HOME `/` — hero RPL, katalog 6 misi AR, leaderboard, info Tugas vs Library.
-2. Login sebagai **admin** (`admin@sintesa.id`) → `/admin` → buat akun guru.
+2. Login sebagai admin yang dibuat dari ADMIN_EMAIL/ADMIN_PASSWORD → `/admin` → buat akun guru.
 3. Login sebagai **Guru** → buat kelas (mis. "Kelas 10 RPL") → buat tugas poin **1.000** + lampiran PDF.
 4. Daftar sebagai **Murid** (otomatis SISWA) → login → buka `/ar` → gabung kelas.
 5. Buka misi RPL di `/ar` → tab Materi & Soal, buka materi kelas → **Tandai Selesai** (+100 XP).
@@ -112,12 +119,12 @@ edu-ar-frontend/src/
   lib/            → api, arCatalog (RPL), gamification, library (satu sumber kebenaran)
 
 edu-ar-backend/
-  server.js       → entry point + static /uploads + 404 JSON + error handler
+  server.js       → Express app untuk Vercel Functions dan development lokal
   routes/         → auth, classes, materials, assignments, library, gamification, admin
   controllers/    → logika tiap domain + validasi role/kepemilikan
-  middleware/     → authMiddleware (JWT), upload (multer 15 MB library/tugas + avatar 2 MB khusus gambar)
+  middleware/     → authMiddleware (JWT) + kebijakan Vercel Blob
+  services/       → verifikasi metadata dan hapus file Vercel Blob
   prisma/         → schema.prisma + seed.js (6 materi RPL Kelas 10 + admin awal)
-  uploads/        → penyimpanan file Library + tasks/ lampiran + avatars/ foto profil
 ```
 
 ## Catatan

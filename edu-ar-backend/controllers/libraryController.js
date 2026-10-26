@@ -1,24 +1,13 @@
 // controllers/libraryController.js
 // Library: simpan & kelola hasil tugas siswa dalam bentuk file apapun
 // (gambar, PDF, Word, PPT, Excel, TXT, ZIP, MP4, MP3).
-const fs = require('fs');
-const path = require('path');
 const prisma = require('../config/db');
-const { UPLOAD_DIR } = require('../middleware/upload');
+const { verifyOwnedBlob, deleteBlobIfVercelUrl } = require('../services/blobStorage');
 
-function toPublicUrl(req, fileName) {
-  return `/uploads/${fileName}`;
-}
-
-function fullUrl(req, fileName) {
-  const base = `${req.protocol}://${req.get('host')}`;
-  return `${base}/uploads/${fileName}`;
-}
-
-// POST /api/library/upload  (SISWA, multipart: file + assignmentId? + classId? + materialId? + description?)
+// POST /api/library/upload receives Blob metadata after the browser uploads the file.
 exports.uploadSubmission = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: 'File wajib diunggah' });
+    if (!req.body?.file) return res.status(400).json({ message: 'File wajib diunggah' });
 
     const { assignmentId, classId, materialId, description } = req.body;
 
@@ -27,41 +16,36 @@ exports.uploadSubmission = async (req, res) => {
 
     if (assignmentId) {
       const assignment = await prisma.assignment.findUnique({ where: { id: assignmentId } });
-      if (!assignment) {
-        fs.unlink(path.join(UPLOAD_DIR, req.file.filename), () => {});
-        return res.status(404).json({ message: 'Tugas tidak ditemukan' });
-      }
+      if (!assignment) return res.status(404).json({ message: 'Tugas tidak ditemukan' });
       // Pastikan siswa anggota kelas tugas tersebut
       const enrollment = await prisma.classEnrollment.findUnique({
         where: { studentId_classId: { studentId: req.user.userId, classId: assignment.classId } },
       });
-      if (!enrollment) {
-        fs.unlink(path.join(UPLOAD_DIR, req.file.filename), () => {});
-        return res.status(403).json({ message: 'Kamu bukan anggota kelas tugas ini' });
-      }
+      if (!enrollment) return res.status(403).json({ message: 'Kamu bukan anggota kelas tugas ini' });
       resolvedClassId = assignment.classId;
       resolvedMaterialId = assignment.materialId || resolvedMaterialId;
     } else if (resolvedClassId) {
       const enrollment = await prisma.classEnrollment.findUnique({
         where: { studentId_classId: { studentId: req.user.userId, classId: resolvedClassId } },
       });
-      if (!enrollment) {
-        fs.unlink(path.join(UPLOAD_DIR, req.file.filename), () => {});
-        return res.status(403).json({ message: 'Kamu bukan anggota kelas ini' });
-      }
+      if (!enrollment) return res.status(403).json({ message: 'Kamu bukan anggota kelas ini' });
     }
 
+    const uploaded = await verifyOwnedBlob(req.body.file, {
+      userId: req.user.userId,
+      scope: 'submission',
+    });
     const submission = await prisma.submission.create({
       data: {
         assignmentId: assignmentId || null,
         studentId: req.user.userId,
         classId: resolvedClassId,
         materialId: resolvedMaterialId,
-        fileName: req.file.filename,
-        originalName: req.file.originalname,
-        mimeType: req.file.mimetype,
-        sizeKb: Math.max(1, Math.round(req.file.size / 1024)),
-        fileUrl: toPublicUrl(req, req.file.filename),
+        fileName: uploaded.pathname,
+        originalName: uploaded.originalName,
+        mimeType: uploaded.mimeType,
+        sizeKb: Math.max(1, Math.round(uploaded.size / 1024)),
+        fileUrl: uploaded.url,
         description: description?.trim() || null,
       },
       include: {
@@ -73,9 +57,9 @@ exports.uploadSubmission = async (req, res) => {
     // Arsip mandiri (tanpa tugas): +0 XP. Tugas guru: +poin tugas.
     const earnedXp = submission.assignment ? (submission.assignment.points || 100) : 0;
 
-    res.status(201).json({ ...submission, fileAbsoluteUrl: fullUrl(req, req.file.filename), earnedXp });
+    res.status(201).json({ ...submission, fileAbsoluteUrl: uploaded.url, earnedXp });
   } catch (error) {
-    res.status(500).json({ message: 'Gagal mengunggah file', error: error.message });
+    res.status(error.status || 500).json({ message: 'Gagal mengunggah file', error: error.message });
   }
 };
 
@@ -203,7 +187,7 @@ exports.deleteSubmission = async (req, res) => {
     }
 
     await prisma.submission.delete({ where: { id: req.params.id } });
-    fs.unlink(path.join(UPLOAD_DIR, row.fileName), () => {});
+    await deleteBlobIfVercelUrl(row.fileUrl);
     res.json({ message: 'File dihapus dari library' });
   } catch (error) {
     res.status(500).json({ message: 'Gagal menghapus file', error: error.message });

@@ -105,27 +105,37 @@ async function ensureSubject(name, jenjang) {
 }
 
 async function ensureAdmin() {
-  const email = process.env.ADMIN_EMAIL || 'admin@sintesa.id';
-  const password = process.env.ADMIN_PASSWORD || 'Admin12345';
-  const usedDefault = !process.env.ADMIN_PASSWORD;
+  const existingAdmin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+  if (existingAdmin) {
+    console.log('ℹ️  Admin sudah ada, dilewati.');
+    return;
+  }
+
+  const email = process.env.ADMIN_EMAIL;
+  const password = process.env.ADMIN_PASSWORD;
+  if (!email || !password) {
+    throw new Error('Set ADMIN_EMAIL dan ADMIN_PASSWORD sebelum membuat akun admin pertama.');
+  }
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    console.log(`ℹ️  Admin sudah ada (${email}), dilewati.`);
-    return;
+    if (existing.role === 'ADMIN') {
+      console.log('ℹ️  Admin sudah ada, dilewati.');
+      return;
+    }
+    throw new Error('ADMIN_EMAIL sudah digunakan oleh akun non-admin.');
   }
 
   const hashed = await bcrypt.hash(password, 10);
   await prisma.user.create({
     data: { name: 'Administrator', email, password: hashed, role: 'ADMIN' },
   });
-  console.log(`✅ Admin dibuat (${email}).`);
-  if (usedDefault) {
-    console.log('⚠️  Memakai password default "Admin12345" — segera ganti lewat database / buat admin baru!');
-  }
+  console.log('✅ Admin pertama dibuat dari ADMIN_EMAIL dan ADMIN_PASSWORD.');
 }
 
 async function main() {
+  await ensureAdmin();
+
   for (const item of CATALOG) {
     const subject = await ensureSubject(item.subjectName, item.jenjang);
 
@@ -171,8 +181,6 @@ async function main() {
       });
     }
   }
-
-  await ensureAdmin();
 
   console.log('✅ Seed selesai! 6 materi RPL Kelas 10 + model AR + akun admin disiapkan.');
 }

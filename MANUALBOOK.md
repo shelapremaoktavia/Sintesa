@@ -27,7 +27,7 @@
 11. [Profil & Foto](#11-profil--foto)
 12. [Deploy Online](#12-deploy-online)
 13. [Troubleshooting](#13-troubleshooting)
-14. [Lampiran A — Akun Bawaan](#lampiran-a--akun-bawaan)
+14. [Lampiran A — Akun Awal](#lampiran-a--akun-awal)
 15. [Lampiran B — Daftar Endpoint API](#lampiran-b--daftar-endpoint-api)
 16. [Lampiran C — Daftar Gambar & Prompt](#lampiran-c--daftar-gambar--prompt)
 
@@ -95,12 +95,14 @@ Buat file `.env` (contoh ada di `.env.example`):
 DATABASE_URL="postgresql://USER:PASSWORD@HOST/DATABASE?sslmode=require"
 JWT_SECRET="isi-string-acak-panjang-minimal-32-karakter"
 PORT=5000
-# Opsional — akun admin awal:
-ADMIN_EMAIL="admin@sintesa.id"
+CORS_ORIGINS="http://localhost:3000,https://alamat-frontend.vercel.app"
+BLOB_READ_WRITE_TOKEN="REDACTED"
+# Hanya diperlukan saat membuat admin pertama:
+ADMIN_EMAIL="admin@contoh.id"
 ADMIN_PASSWORD="REDACTED"
 ```
 
-Lalu siapkan database + data awal:
+Lalu siapkan database dan data awal. Seed membuat admin pertama hanya bila belum ada admin dan kredensial ADMIN_EMAIL/ADMIN_PASSWORD telah diisi:
 
 ```bash
 npm run generate   # generate Prisma Client
@@ -108,6 +110,8 @@ npm run migrate    # terapkan migrasi (pertama kali)
 npm run seed       # isi 6 materi RPL + buat akun admin bila belum ada
 npm run dev        # jalan di http://localhost:5000
 ```
+
+Unggahan lokal juga memakai Vercel Blob. Jika callback upload diuji dari localhost, gunakan tunnel publik dan isi VERCEL_BLOB_CALLBACK_URL dengan alamat tunnel lengkap sampai /api/uploads/client.
 
 Tes backend: buka `http://localhost:5000/` → harus tampil *"Backend Sintesa berjalan! 🚀"*.
 
@@ -301,11 +305,16 @@ Setiap misi = **1 model 3D/AR + 3 artikel materi + 3 soal pilihan ganda berpemba
 
 | Lapisan | Hosting | Catatan |
 |---|---|---|
-| Frontend | Vercel dan/atau Netlify | Env `NEXT_PUBLIC_API_URL` = URL backend + `/api` |
-| Backend | Railway | Env `DATABASE_URL`, `JWT_SECRET`, `PORT`; migrasi jalan otomatis via script `build` |
-| Database | Neon PostgreSQL | Sama untuk lokal & online |
+| Frontend | Vercel | Root Directory `edu-ar-frontend`; Env `NEXT_PUBLIC_API_URL` = URL backend + `/api` |
+| Backend API + auth | Vercel | Project terpisah dengan Root Directory `edu-ar-backend`; Express berjalan sebagai Vercel Function |
+| Penyimpanan file | Vercel Blob | Buat Blob store Public dan hubungkan ke project backend agar `BLOB_READ_WRITE_TOKEN` tersedia |
+| Database | Neon PostgreSQL | Tetap gunakan PostgreSQL yang sama; Vercel menjalankan API/auth, bukan database di filesystem function |
 
-Alur rilis: `git add -A` → `git commit -m "..."` → `git push origin main` → Railway + Vercel/Netlify deploy otomatis. File `netlify.toml` dan `edu-ar-frontend/vercel.json` sudah disiapkan di repo.
+Set `DATABASE_URL`, `JWT_SECRET` (acak, minimal 32 karakter), dan `CORS_ORIGINS` di backend. Set `NEXT_PUBLIC_API_URL` di frontend ke deployment backend + `/api`. Jalankan `npm run migrate:deploy` satu kali untuk database production; build Vercel hanya menjalankan `prisma generate`.
+
+File lama yang tersimpan di disk Railway tidak berpindah otomatis. Salin file lama ke Blob sebelum mematikan Railway, atau set `NEXT_PUBLIC_LEGACY_UPLOADS_URL` di frontend untuk sementara agar tautan relatif lama tetap mengarah ke Railway. Upload baru langsung masuk ke Blob.
+
+Lihat [VERCEL_DEPLOY.md](VERCEL_DEPLOY.md) untuk langkah dashboard. Repo tidak menyediakan password admin bawaan; buat admin pertama memakai `ADMIN_EMAIL` dan `ADMIN_PASSWORD`.
 
 > ⚠️ **Catatan jaringan Indonesia**: domain `*.vercel.app` kadang diblokir operator. Solusi gratis: pindah frontend ke Netlify (`*.netlify.app`), atau pasang domain sendiri, atau buka via DNS `one.one.one.one` / aplikasi WARP.
 
@@ -319,7 +328,7 @@ Alur rilis: `git add -A` → `git commit -m "..."` → `git push origin main` �
 | Login gagal padahal akun benar | `JWT_SECRET` beda/kosong di backend | Isi `JWT_SECRET` (min. 32 karakter acak), restart backend |
 | `next: command not found` (Vercel) | Install Command salah | Isi `npm install`; Framework = Next.js; Root = `edu-ar-frontend` |
 | 404 di Vercel/Netlify | Root Directory salah | Root = `edu-ar-frontend`; publish biarkan default/kosong |
-| `DATABASE_URL not found` (Railway) | Variabel belum masuk deployment | Tambah variabel → tunggu redeploy selesai |
+| `DATABASE_URL not found` (Vercel) | Variabel belum masuk project backend | Tambah variabel di project backend → redeploy |
 | Model 3D tidak muncul | Jaringan / WebGL | Gunakan Chrome terbaru, koneksi stabil; coba mode 3D biasa dulu |
 | Upload ditolak | Tipe/ukuran file | Samakan dengan whitelist: gambar, PDF, Word, PPT, Excel, TXT, CSV, ZIP, MP4/MP3; maks 15 MB (foto profil 2 MB) |
 | XP tugas tidak masuk | Revisi file yang sama | XP dihitung sekali per tugas; file pertama yang memberi XP |
@@ -327,15 +336,15 @@ Alur rilis: `git add -A` → `git commit -m "..."` → `git push origin main` �
 
 ---
 
-## Lampiran A — Akun Bawaan
+## Lampiran A — Akun Awal
 
 | Akun | Email | Password | Dibuat oleh |
 |---|---|---|---|
-| Admin awal | `admin@sintesa.id` | `Admin12345` | `npm run seed` (**segera ganti!**) |
+| Admin pertama | Diatur lewat `ADMIN_EMAIL` | Diatur lewat `ADMIN_PASSWORD` | `npm run seed` |
 | Guru | — | — | Dibuat admin di `/admin` |
 | Murid | — | — | Daftar sendiri di `/register` |
 
-Ubah kredensial admin via `ADMIN_EMAIL` / `ADMIN_PASSWORD` di `.env` sebelum seed, atau buat admin baru lalu hapus yang lama.
+Tidak ada akun/password admin bawaan di source. Jika repo pernah dipakai dengan kredensial lama yang dipublikasikan, rotasi password admin sebelum deploy.
 
 ---
 
@@ -349,7 +358,8 @@ Basis: `http://localhost:5000/api` (lokal) — semua kecuali register/login butu
 | POST | `/auth/login` | Publik | Masuk |
 | GET | `/auth/me` | Login | Profil sendiri |
 | PATCH | `/auth/me` | Login | Ubah nama/password |
-| POST | `/auth/avatar` | Login | Unggah foto (multipart `avatar`, 2 MB) |
+| POST | `/auth/avatar` | Login | Simpan metadata foto Blob yang sudah diunggah (JSON, maks 2 MB) |
+| POST | `/uploads/client` | Login | Token upload langsung ke Vercel Blob |
 | GET | `/admin/users` | ADMIN | Daftar pengguna |
 | POST | `/admin/teachers` | ADMIN | Buat akun guru |
 | POST | `/classes` | GURU | Buat kelas (+kode) |
@@ -361,11 +371,11 @@ Basis: `http://localhost:5000/api` (lokal) — semua kecuali register/login butu
 | GET | `/materials/:id` | Publik | Detail materi |
 | PATCH | `/materials/:id/assign` | GURU | Tugaskan ke kelas |
 | PATCH | `/materials/:id/progress` | SISWA | Tandai dilihat/selesai |
-| POST | `/assignments` | GURU | Buat tugas (+lampiran `attachment`) |
+| POST | `/assignments` | GURU | Buat tugas (+metadata lampiran Blob pada field `attachment`) |
 | GET | `/assignments/my` | Login | Tugas saya |
 | GET | `/assignments/class/:classId` | Anggota | Tugas per kelas |
 | DELETE | `/assignments/:id` | GURU | Hapus tugas |
-| POST | `/library/upload` | SISWA | Kumpul/arsip file |
+| POST | `/library/upload` | SISWA | Simpan metadata submission/arsip Blob (JSON) |
 | GET | `/library` | Login | Daftar file |
 | GET | `/library/stats` | Login | Statistik file |
 | DELETE | `/library/:id` | Pemilik/Guru | Hapus file |
